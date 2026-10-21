@@ -1,8 +1,22 @@
 const products=[['VODELYS','Bavette d’aloyau boule','18,85 €/kg'],['VODELYS','Mangue cubes','8,05 €/kg'],['VODELYS','Os gouttière','9,75 €/kg'],['VODELYS','Crevette entière crue sauvage 10/20','16,75 €/kg'],['VODELYS','Moule entière cuite 80/100','6,33 €/kg'],['VODELYS','Stracciatella 100 g','25,00 €/kg'],['West Indies Trade','Mozzarella Bella Stella','7,85 €/kg'],['West Indies Trade','Semola Caputo','2,756 €/kg'],['West Indies Trade','Prosciutto Nazionale','22,95 €/kg'],['West Indies Trade','Spianata picante entière','22,90 €/kg'],['Boniteau / Bino Viandes','Jambon blanc supérieur DD','11,50 €/kg']];
 document.getElementById('products').innerHTML=products.map(p=>`<div class="product"><b>${p[1]}</b><span>${p[0]} · ${p[2]}</span></div>`).join('');
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button,.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.tab).classList.add('active')});
-function addRecipe(){const n=prompt('Nom de la nouvelle recette :');if(n){const saved=JSON.parse(localStorage.getItem('foodcost_recipes')||'[]');saved.push({name:n});localStorage.setItem('foodcost_recipes',JSON.stringify(saved));document.getElementById('recipeCount').textContent=1+saved.length;alert('Recette enregistrée sur cet appareil.')}}
+function addRecipe(){
+  const n=prompt('Nom de la recette :');
+  if(!n) return;
+
+  const recipes=JSON.parse(localStorage.getItem('foodCostRecipes')||'[]');
+  recipes.push({
+    name:n,
+    createdAt:new Date().toISOString()
+  });
+
+  localStorage.setItem('foodCostRecipes',JSON.stringify(recipes));
+  alert('Recette enregistrée : '+n);
+  location.reload();
+}
 function invoiceSelected(i){document.getElementById('invoiceStatus').textContent=i.files[0]?'Photo sélectionnée : '+i.files[0].name+' — en attente de validation.':''}
 function plateSelected(i){document.getElementById('plateStatus').textContent=i.files[0]?'Photo prête. Le module IA sera connecté à l’étape suivante.':''}
 const saved=JSON.parse(localStorage.getItem('foodcost_recipes')||'[]');document.getElementById('recipeCount').textContent=1+saved.length;
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+// FOOD COST V1
