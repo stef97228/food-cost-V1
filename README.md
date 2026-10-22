@@ -1,9 +1,9 @@
-# FOOD COST V6.6
-Test OCR spatial :
-- conserve le prétraitement V6.4 ;
-- conserve le filtre V6.5 en secours ;
-- exploite les coordonnées Tesseract pour lire Désignation / Qté / PU / Total par colonnes ;
-- métadonnées facture lues séparément ;
-- validation humaine toujours obligatoire ;
-- aucune remise à zéro des données localStorage.
-Téléverser les 4 fichiers sans supprimer les fichiers existants.
+# FOOD COST V6.7
+Filtre strict facture :
+- conserve le prétraitement OCR et la lecture spatiale existants ;
+- une ligne n'est proposée que si quantité × prix unitaire ≈ total HT ;
+- rejette les lignes OCR incohérentes ;
+- fournisseur/date/n° restent issus des lecteurs précédents ;
+- validation humaine obligatoire ;
+- aucune donnée localStorage réinitialisée.
+Téléverser les 4 fichiers sans supprimer les autres fichiers du dépôt.
