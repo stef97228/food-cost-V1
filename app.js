@@ -1,130 +1,54 @@
-const PRODUCTS=[
-{id:"mozzarella",supplier:"West Indies Trade",name:"Mozzarella Bella Stella 6×2 kg",price:7.85,unit:"kg"},
-{id:"semola",supplier:"West Indies Trade",name:"Semola Caputo 25 kg",price:2.756,unit:"kg"},
-{id:"prosciutto",supplier:"West Indies Trade",name:"Prosciutto Nazionale 6 kg",price:22.95,unit:"kg"},
-{id:"spianata",supplier:"West Indies Trade",name:"Spianata picante entière",price:22.90,unit:"kg"},
-{id:"bavette",supplier:"VODELYS",name:"Bavette d’aloyau boule",price:18.85,unit:"kg"},
-{id:"mangue",supplier:"VODELYS",name:"Mangue cubes",price:8.05,unit:"kg"},
-{id:"os",supplier:"VODELYS",name:"Os gouttière",price:9.75,unit:"kg"},
-{id:"crevette",supplier:"VODELYS",name:"Crevette entière crue sauvage 10/20",price:16.75,unit:"kg"},
-{id:"moule",supplier:"VODELYS",name:"Moule entière cuite 80/100",price:6.33,unit:"kg"},
-{id:"stracciatella",supplier:"VODELYS",name:"Stracciatella 100 g",price:25.00,unit:"kg"},
-{id:"jambon",supplier:"Boniteau / Bino Viandes",name:"Jambon blanc supérieur DD",price:11.50,unit:"kg"},
-{id:"filet",supplier:"Pro à Pro",name:"Filet de poulet UE 120/160 g",price:9.176,unit:"kg"}
-];
-const CAP_DEFAULT={id:"caponne",name:"Escalope de poulet Caponne",salePrice:null,notes:"Cuisse de poulet désossée · 190 g cru",ingredients:[
-{name:"Cuisse de poulet désossée",qty:190,unit:"g",productId:"",manualPrice:null,status:"confirmé",note:"Prix manquant. Ne pas utiliser le prix du filet."},
-{name:"Farine",qty:15,unit:"g",productId:"",manualPrice:null,status:"à valider"},
-{name:"Œuf",qty:25,unit:"g",productId:"",manualPrice:null,status:"à valider"},
-{name:"Chapelure",qty:30,unit:"g",productId:"",manualPrice:null,status:"à valider"},
-{name:"Sauce gorgonzola",qty:60,unit:"g",productId:"",subrecipeId:"gorgonzola",manualPrice:null,status:"sous-recette à valider"},
-{name:"Mozzarella",qty:50,unit:"g",productId:"mozzarella",manualPrice:null,status:"grammage à valider"},
-{name:"Penne sèches",qty:100,unit:"g",productId:"",manualPrice:null,status:"à valider"},
-{name:"Crème parmesan-ail",qty:93,unit:"g",productId:"",subrecipeId:"parmesan-garlic",manualPrice:null,status:"sous-recette à valider"},
-{name:"Copeaux de parmesan",qty:10,unit:"g",productId:"",manualPrice:null,status:"à valider"},
-{name:"Persil",qty:2,unit:"g",productId:"",manualPrice:null,status:"à valider"}]};
-const K="foodCostRecipesV3",K2="foodCostRecipesV2",OLD="foodCostRecipes";
-const SUBK="foodCostSubrecipesV4";
-const SUB_DEFAULT=[
- {id:"gorgonzola",name:"Sauce gorgonzola",yieldG:1000,ingredients:[]},
- {id:"parmesan-garlic",name:"Crème parmesan-ail",yieldG:1000,ingredients:[]}
-];
-function loadSubs(){try{let a=JSON.parse(localStorage.getItem(SUBK)||"null");if(Array.isArray(a)&&a.length)return a}catch{};let a=clone(SUB_DEFAULT);localStorage.setItem(SUBK,JSON.stringify(a));return a}
-function saveSubs(a){localStorage.setItem(SUBK,JSON.stringify(a))}
-function subCostPerKg(id){
- let s=loadSubs().find(x=>x.id===id); if(!s||!(Number(s.yieldG)>0)||!(s.ingredients||[]).length)return null;
- let total=0;
- for(const i of s.ingredients){let c=ingredientCost(i);if(c==null)return null;total+=c}
- return total/(Number(s.yieldG)/1000);
-}
+const BASE_PRODUCTS=[
+{id:"mozzarella",supplier:"West Indies Trade",name:"Mozzarella Bella Stella 6×2 kg",price:7.85,unit:"kg"},{id:"semola",supplier:"West Indies Trade",name:"Semola Caputo 25 kg",price:2.756,unit:"kg"},{id:"prosciutto",supplier:"West Indies Trade",name:"Prosciutto Nazionale 6 kg",price:22.95,unit:"kg"},{id:"spianata",supplier:"West Indies Trade",name:"Spianata picante entière",price:22.90,unit:"kg"},{id:"bavette",supplier:"VODELYS",name:"Bavette d’aloyau boule",price:18.85,unit:"kg"},{id:"mangue",supplier:"VODELYS",name:"Mangue cubes",price:8.05,unit:"kg"},{id:"os",supplier:"VODELYS",name:"Os gouttière",price:9.75,unit:"kg"},{id:"crevette",supplier:"VODELYS",name:"Crevette entière crue sauvage 10/20",price:16.75,unit:"kg"},{id:"moule",supplier:"VODELYS",name:"Moule entière cuite 80/100",price:6.33,unit:"kg"},{id:"stracciatella",supplier:"VODELYS",name:"Stracciatella 100 g",price:25,unit:"kg"},{id:"jambon",supplier:"Boniteau / Bino Viandes",name:"Jambon blanc supérieur DD",price:11.5,unit:"kg"},{id:"filet",supplier:"Pro à Pro",name:"Filet de poulet UE 120/160 g",price:9.176,unit:"kg"}];
+const CAP_DEFAULT={id:"caponne",name:"Escalope de poulet Caponne",salePrice:null,notes:"Cuisse de poulet désossée · 190 g cru",ingredients:[{name:"Cuisse de poulet désossée",qty:190,unit:"g",productId:"",manualPrice:null,status:"confirmé",note:"Prix manquant. Ne pas utiliser le prix du filet."},{name:"Farine",qty:15,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Œuf",qty:25,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Chapelure",qty:30,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Sauce gorgonzola",qty:60,unit:"g",productId:"",subrecipeId:"gorgonzola",manualPrice:null,status:"sous-recette à valider"},{name:"Mozzarella",qty:50,unit:"g",productId:"mozzarella",manualPrice:null,status:"grammage à valider"},{name:"Penne sèches",qty:100,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Crème parmesan-ail",qty:93,unit:"g",productId:"",subrecipeId:"parmesan-garlic",manualPrice:null,status:"sous-recette à valider"},{name:"Copeaux de parmesan",qty:10,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Persil",qty:2,unit:"g",productId:"",manualPrice:null,status:"à valider"}]};
+const RK="foodCostRecipesV3",R2="foodCostRecipesV2",RO="foodCostRecipes",SK="foodCostSubrecipesV4",PK="foodCostProductsV5",IK="foodCostInvoicesV5",STK="foodCostInventoryV5";
+const SUB_DEFAULT=[{id:"gorgonzola",name:"Sauce gorgonzola",yieldG:1000,ingredients:[]},{id:"parmesan-garlic",name:"Crème parmesan-ail",yieldG:1000,ingredients:[]}];
 const clone=x=>JSON.parse(JSON.stringify(x));
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function euro(n){return Number(n).toLocaleString("fr-FR",{style:"currency",currency:"EUR"})}
-function product(id){return PRODUCTS.find(p=>p.id===id)}
-function migrateIngredient(i){
- let pid=i.productId||"", sid=i.subrecipeId||"";
- if(!pid&&i.name==="Mozzarella")pid="mozzarella";
- if(!sid&&i.name==="Sauce gorgonzola")sid="gorgonzola";
- if(!sid&&i.name==="Crème parmesan-ail")sid="parmesan-garlic";
- return{name:i.name||"",qty:Number(i.qty)||0,unit:i.unit||"g",productId:pid,subrecipeId:sid,manualPrice:i.manualPrice??(pid||sid?"":i.price??null),status:i.status||"",note:i.note||""}
-}
-function initialData(){
- let prior=[];try{prior=JSON.parse(localStorage.getItem(K2)||"[]")}catch{}
- if(!Array.isArray(prior)||!prior.length){try{prior=JSON.parse(localStorage.getItem(OLD)||"[]")}catch{}}
- let cap=clone(CAP_DEFAULT), users=[];
- for(const r of (Array.isArray(prior)?prior:[])){
-   if(!r||!r.name)continue;
-   if(r.id==="caponne"||r.name===CAP_DEFAULT.name){cap={...cap,...r,id:"caponne",ingredients:(r.ingredients||cap.ingredients).map(migrateIngredient)}}
-   else users.push({id:r.id||"r"+Date.now()+Math.random(),name:r.name,salePrice:r.salePrice||null,notes:r.notes||"",ingredients:(r.ingredients||[]).map(migrateIngredient)})
- }
- return [cap,...users]
-}
-function load(){try{let a=JSON.parse(localStorage.getItem(K)||"null");if(Array.isArray(a)&&a.length)return a}catch{};let a=initialData();save(a);return a}
-function save(a){localStorage.setItem(K,JSON.stringify(a))}
-function unitPrice(i){
- if(i.subrecipeId)return subCostPerKg(i.subrecipeId);
- let p=product(i.productId);if(p)return p.price;
- let m=Number(i.manualPrice);return m>0?m:null
-}
-function ingredientCost(i){let p=unitPrice(i),q=Number(i.qty);if(!(p>0)||!(q>=0))return null;if(i.unit==="g"||i.unit==="ml")return q/1000*p;if(i.unit==="kg"||i.unit==="L"||i.unit==="piece")return q*p;return null}
-function metrics(r){let total=0,missing=false;if(!(r.ingredients||[]).length)missing=true;for(const i of r.ingredients||[]){let c=ingredientCost(i);if(c==null)missing=true;else total+=c}let cost=missing?null:total,s=Number(r.salePrice);if(!(cost>0&&s>0))return{cost,coef:null,ratio:null,color:"yellow",label:"À chiffrer"};let k=s/cost,ratio=cost/s*100,color=k>=4?"green":k>=3?"yellow":"red";return{cost,coef:k,ratio,color,label:(color==="green"?"🟢":color==="yellow"?"🟡":"🔴")+" Coef. "+k.toFixed(2)}}
-function render(){let rs=load();document.querySelector("#recipeCount").textContent=rs.length;document.querySelector("#alertCount").textContent=rs.filter(r=>metrics(r).color==="red").length;document.querySelector("#recipeList").innerHTML=rs.map(r=>{let m=metrics(r);let warn=r.id==="caponne"?`<p class="warning">Le prix de la cuisse de poulet n’est pas encore renseigné. Aucun prix de filet de poulet ne sera substitué.</p>`:"";return `<article class="recipe"><div class="recipe-head"><h3>${esc(r.name)}</h3><span class="badge ${m.color}">${m.label}</span></div><p class="muted">${esc(r.notes||"")}</p>${warn}<div class="costline"><span>Coût matière</span><b>${m.cost==null?"À compléter":euro(m.cost)}</b></div>${m.ratio==null?"":`<div class="costline"><span>Ratio matière</span><b>${m.ratio.toFixed(1)} %</b></div>`}<button class="openRecipe" data-id="${esc(r.id)}">Ouvrir / modifier la fiche</button></article>`}).join("");document.querySelectorAll(".openRecipe").forEach(b=>b.onclick=()=>openEdit(b.dataset.id))}
-function options(selected,subSelected){
- let subs=loadSubs().map(s=>`<option value="sub:${s.id}" ${subSelected===s.id?"selected":""}>Sous-recette : ${esc(s.name)}</option>`).join("");
- return `<option value="">Prix manuel / non lié</option>`+subs+PRODUCTS.map(p=>`<option value="${p.id}" ${selected===p.id?"selected":""}>${esc(p.name)} — ${euro(p.price)}/kg</option>`).join("")
-}
-function row(i={name:"",qty:"",unit:"g",productId:"",manualPrice:"",status:""}){
- let div=document.createElement("div");div.className="ingrow";div.innerHTML=`<input class="iName" placeholder="Ingrédient" value="${esc(i.name)}"><div class="inggrid"><input class="iQty" type="number" min="0" step=".01" placeholder="Qté" value="${i.qty??""}"><select class="iUnit"><option ${i.unit==="g"?"selected":""}>g</option><option ${i.unit==="kg"?"selected":""}>kg</option><option ${i.unit==="ml"?"selected":""}>ml</option><option ${i.unit==="L"?"selected":""}>L</option><option ${i.unit==="piece"?"selected":""}>piece</option></select></div><select class="iProduct">${options(i.productId||"",i.subrecipeId||"")}</select><label class="mini">Prix manuel €/kg, €/L ou €/pièce<input class="iPrice" type="number" min="0" step=".001" value="${i.manualPrice??""}" ${i.productId?"disabled":""}></label><input class="iStatus" placeholder="Statut (ex. à valider)" value="${esc(i.status||"")}"><div class="rowfoot"><span class="iCost">—</span><button type="button" class="remove">Supprimer</button></div>`;div.querySelector(".remove").onclick=()=>{div.remove();live()};div.querySelectorAll("input,select").forEach(x=>x.addEventListener("input",()=>{if(x.classList.contains("iProduct"))div.querySelector(".iPrice").disabled=!!x.value;live()}));return div
-}
-function readRows(){return[...document.querySelectorAll(".ingrow")].map(d=>({name:d.querySelector(".iName").value.trim(),qty:Number(d.querySelector(".iQty").value)||0,unit:d.querySelector(".iUnit").value,productId:d.querySelector(".iProduct").value.startsWith("sub:")?"":d.querySelector(".iProduct").value,subrecipeId:d.querySelector(".iProduct").value.startsWith("sub:")?d.querySelector(".iProduct").value.slice(4):"",manualPrice:d.querySelector(".iPrice").value?Number(d.querySelector(".iPrice").value):null,status:d.querySelector(".iStatus").value.trim()})).filter(i=>i.name)}
-function live(){let r={salePrice:Number(document.querySelector("#editSale").value)||null,ingredients:readRows()},m=metrics(r);[...document.querySelectorAll(".ingrow")].forEach((d,n)=>{let i=r.ingredients[n],c=i?ingredientCost(i):null;d.querySelector(".iCost").textContent=c==null?"Prix manquant":euro(c)});document.querySelector("#liveMetrics").innerHTML=`<b>Calcul automatique</b><span>Coût matière : ${m.cost==null?"incomplet":euro(m.cost)}</span><span>Coefficient : ${m.coef==null?"—":m.coef.toFixed(2)}</span><span>Ratio matière : ${m.ratio==null?"—":m.ratio.toFixed(1)+" %"}</span>`}
-const editDlg=document.querySelector("#editDialog");
-function openEdit(id){let r=load().find(x=>x.id===id);if(!r)return;document.querySelector("#editId").value=r.id;document.querySelector("#editName").value=r.name;document.querySelector("#editSale").value=r.salePrice??"";document.querySelector("#editNotes").value=r.notes||"";let box=document.querySelector("#ingredientRows");box.innerHTML="";(r.ingredients||[]).forEach(i=>box.appendChild(row(i)));live();editDlg.showModal()}
-document.querySelector("#addIngredient").onclick=()=>{document.querySelector("#ingredientRows").appendChild(row());live()}
-document.querySelector("#cancelEdit").onclick=()=>editDlg.close();
-document.querySelector("#editSale").addEventListener("input",live);
-document.querySelector("#editForm").onsubmit=e=>{e.preventDefault();let a=load(),id=document.querySelector("#editId").value,idx=a.findIndex(x=>x.id===id);if(idx<0)return;a[idx]={...a[idx],name:document.querySelector("#editName").value.trim(),salePrice:Number(document.querySelector("#editSale").value)||null,notes:document.querySelector("#editNotes").value.trim(),ingredients:readRows()};save(a);editDlg.close();render()}
-document.querySelector("#productCount").textContent=PRODUCTS.length;document.querySelector("#productList").innerHTML=PRODUCTS.map(p=>`<article class="product"><b>${esc(p.name)}</b><span>${esc(p.supplier)}</span><strong>${euro(p.price)}/kg</strong></article>`).join("");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const euro=n=>Number(n).toLocaleString("fr-FR",{style:"currency",currency:"EUR"});
+const today=()=>new Date().toISOString().slice(0,10);
+function jsonGet(k,d){try{let x=JSON.parse(localStorage.getItem(k)||"null");return x??d}catch{return d}}
+function jsonSet(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function loadProducts(){let x=jsonGet(PK,null);if(Array.isArray(x)&&x.length)return x;let a=BASE_PRODUCTS.map(p=>({...p,priceDate:"2026-10-14",history:[{date:"2026-10-14",price:p.price}]}));jsonSet(PK,a);return a}
+function saveProducts(a){jsonSet(PK,a)}
+function product(id){return loadProducts().find(p=>p.id===id)}
+function migrateIngredient(i){let pid=i.productId||"",sid=i.subrecipeId||"";if(!pid&&i.name==="Mozzarella")pid="mozzarella";if(!sid&&i.name==="Sauce gorgonzola")sid="gorgonzola";if(!sid&&i.name==="Crème parmesan-ail")sid="parmesan-garlic";return{name:i.name||"",qty:Number(i.qty)||0,unit:i.unit||"g",productId:pid,subrecipeId:sid,manualPrice:i.manualPrice??(pid||sid?"":i.price??null),status:i.status||"",note:i.note||""}}
+function initialRecipes(){let prior=jsonGet(R2,[]);if(!Array.isArray(prior)||!prior.length)prior=jsonGet(RO,[]);let cap=clone(CAP_DEFAULT),users=[];for(const r of (Array.isArray(prior)?prior:[])){if(!r?.name)continue;if(r.id==="caponne"||r.name===CAP_DEFAULT.name)cap={...cap,...r,id:"caponne",ingredients:(r.ingredients||cap.ingredients).map(migrateIngredient)};else users.push({...r,id:r.id||"r"+Date.now()+Math.random(),ingredients:(r.ingredients||[]).map(migrateIngredient)})}return[cap,...users]}
+function loadRecipes(){let a=jsonGet(RK,null);if(Array.isArray(a)&&a.length)return a;a=initialRecipes();jsonSet(RK,a);return a}function saveRecipes(a){jsonSet(RK,a)}
+function loadSubs(){let a=jsonGet(SK,null);if(Array.isArray(a)&&a.length)return a;a=clone(SUB_DEFAULT);jsonSet(SK,a);return a}function saveSubs(a){jsonSet(SK,a)}
+function subYield(s){let unit=s.yieldUnit||"g",q=Number(s.yieldQty??s.yieldG)||0;return{q,unit}}
+function subUnitPrice(id){let s=loadSubs().find(x=>x.id===id);if(!s||(s.ingredients||[]).length===0)return null;let total=0;for(const i of s.ingredients){let c=ingredientCost(i);if(c==null)return null;total+=c}let y=subYield(s);if(!(y.q>0))return null;if(y.unit==="g")return{price:total/(y.q/1000),unit:"kg"};if(y.unit==="kg")return{price:total/y.q,unit:"kg"};if(y.unit==="ml")return{price:total/(y.q/1000),unit:"L"};if(y.unit==="L")return{price:total/y.q,unit:"L"};return null}
+function compatible(qUnit,pUnit){return(pUnit==="kg"&&["g","kg"].includes(qUnit))||(pUnit==="L"&&["ml","L"].includes(qUnit))||(pUnit==="piece"&&qUnit==="piece")}
+function unitPrice(i){if(i.subrecipeId)return subUnitPrice(i.subrecipeId);let p=product(i.productId);if(p)return{price:p.price,unit:p.unit};let m=Number(i.manualPrice);return m>0?{price:m,unit:i.unit==="ml"||i.unit==="L"?"L":i.unit==="piece"?"piece":"kg"}:null}
+function ingredientCost(i){let up=unitPrice(i),q=Number(i.qty);if(!up||!(q>=0)||!compatible(i.unit,up.unit))return null;if(i.unit==="g"||i.unit==="ml")return q/1000*up.price;return q*up.price}
+function metrics(r){let total=0,missing=!(r.ingredients||[]).length;for(const i of r.ingredients||[]){let c=ingredientCost(i);if(c==null)missing=true;else total+=c}let cost=missing?null:total,s=Number(r.salePrice);if(!(cost>0&&s>0))return{cost,coef:null,ratio:null,color:"yellow",label:"À chiffrer"};let k=s/cost,ratio=cost/s*100,color=k>=4?"green":k>=3?"yellow":"red";return{cost,coef:k,ratio,color,label:(color==="green"?"🟢":color==="yellow"?"🟡":"🔴")+" Coef. "+k.toFixed(2)}}
+function options(selected,subSelected){let subs=loadSubs().map(s=>`<option value="sub:${s.id}" ${subSelected===s.id?"selected":""}>Sous-recette : ${esc(s.name)}</option>`).join("");return `<option value="">Prix manuel / non lié</option>`+subs+loadProducts().map(p=>`<option value="${p.id}" ${selected===p.id?"selected":""}>${esc(p.name)} — ${euro(p.price)}/${p.unit}</option>`).join("")}
+function row(i={name:"",qty:"",unit:"g",productId:"",manualPrice:"",status:""}){let d=document.createElement("div");d.className="ingrow";d.innerHTML=`<input class="iName" placeholder="Ingrédient" value="${esc(i.name)}"><div class="inggrid"><input class="iQty" type="number" min="0" step=".01" placeholder="Qté" value="${i.qty??""}"><select class="iUnit">${["g","kg","ml","L","piece"].map(u=>`<option ${i.unit===u?"selected":""}>${u}</option>`).join("")}</select></div><select class="iProduct">${options(i.productId||"",i.subrecipeId||"")}</select><label class="mini">Prix manuel €/kg, €/L ou €/pièce<input class="iPrice" type="number" min="0" step=".001" value="${i.manualPrice??""}" ${i.productId||i.subrecipeId?"disabled":""}></label><input class="iStatus" placeholder="Statut (ex. à valider)" value="${esc(i.status||"")}"><div class="rowfoot"><span class="iCost">—</span><button type="button" class="remove">Supprimer</button></div>`;d.querySelector(".remove").onclick=()=>{d.remove();live();subLive()};d.querySelectorAll("input,select").forEach(x=>x.addEventListener("input",()=>{if(x.classList.contains("iProduct"))d.querySelector(".iPrice").disabled=!!x.value;live();subLive()}));return d}
+function readRows(sel="#ingredientRows .ingrow"){return[...document.querySelectorAll(sel)].map(d=>{let raw=d.querySelector(".iProduct").value;return{name:d.querySelector(".iName").value.trim(),qty:Number(d.querySelector(".iQty").value)||0,unit:d.querySelector(".iUnit").value,productId:raw.startsWith("sub:")?"":raw,subrecipeId:raw.startsWith("sub:")?raw.slice(4):"",manualPrice:d.querySelector(".iPrice").value?Number(d.querySelector(".iPrice").value):null,status:d.querySelector(".iStatus").value.trim()}}).filter(i=>i.name)}
+function renderRecipes(){let rs=loadRecipes();recipeCount.textContent=rs.length;alertCount.textContent=rs.filter(r=>metrics(r).color==="red").length;recipeList.innerHTML=rs.map(r=>{let m=metrics(r),warn=r.id==="caponne"?`<p class="warning">Le prix de la cuisse de poulet n’est pas encore renseigné. Aucun prix de filet ne sera substitué.</p>`:"";return`<article class="recipe"><div class="recipe-head"><h3>${esc(r.name)}</h3><span class="badge ${m.color}">${m.label}</span></div><p class="muted">${esc(r.notes||"")}</p>${warn}<div class="costline"><span>Coût matière</span><b>${m.cost==null?"À compléter":euro(m.cost)}</b></div>${m.ratio==null?"":`<div class="costline"><span>Ratio matière</span><b>${m.ratio.toFixed(1)} %</b></div>`}<button class="openRecipe" data-id="${r.id}">Ouvrir / modifier la fiche</button></article>`}).join("");document.querySelectorAll(".openRecipe").forEach(b=>b.onclick=()=>openEdit(b.dataset.id))}
+function live(){if(!document.querySelector("#editDialog[open]"))return;let r={salePrice:Number(editSale.value)||null,ingredients:readRows()},m=metrics(r);[...document.querySelectorAll("#ingredientRows .ingrow")].forEach((d,n)=>{let c=r.ingredients[n]?ingredientCost(r.ingredients[n]):null;d.querySelector(".iCost").textContent=c==null?"Prix manquant / unité incompatible":euro(c)});liveMetrics.innerHTML=`<b>Calcul automatique</b><span>Coût matière : ${m.cost==null?"incomplet":euro(m.cost)}</span><span>Coefficient : ${m.coef==null?"—":m.coef.toFixed(2)}</span><span>Ratio matière : ${m.ratio==null?"—":m.ratio.toFixed(1)+" %"}</span>`}
+function openEdit(id){let r=loadRecipes().find(x=>x.id===id);if(!r)return;editId.value=r.id;editName.value=r.name;editSale.value=r.salePrice??"";editNotes.value=r.notes||"";ingredientRows.innerHTML="";(r.ingredients||[]).forEach(i=>ingredientRows.appendChild(row(i)));editDialog.showModal();live()}
+addIngredient.onclick=()=>{ingredientRows.appendChild(row());live()};cancelEdit.onclick=()=>editDialog.close();editSale.addEventListener("input",live);editForm.onsubmit=e=>{e.preventDefault();let a=loadRecipes(),idx=a.findIndex(x=>x.id===editId.value);if(idx<0)return;a[idx]={...a[idx],name:editName.value.trim(),salePrice:Number(editSale.value)||null,notes:editNotes.value.trim(),ingredients:readRows()};saveRecipes(a);editDialog.close();renderAll()}
+addRecipeBtn.onclick=()=>recipeDialog.showModal();cancelRecipe.onclick=()=>recipeDialog.close();recipeForm.onsubmit=e=>{e.preventDefault();let a=loadRecipes();a.push({id:"r"+Date.now(),name:rName.value.trim(),salePrice:Number(rSale.value)||null,notes:rNotes.value.trim(),ingredients:[]});saveRecipes(a);e.target.reset();recipeDialog.close();renderAll()}
+function renderProducts(){let ps=loadProducts();productCount.textContent=ps.length;productList.innerHTML=ps.map(p=>`<article class="product"><b>${esc(p.name)}</b><span>${esc(p.supplier)}</span><strong>${euro(p.price)}/${p.unit}</strong>${p.priceDate?`<small>Prix du ${new Date(p.priceDate+"T12:00:00").toLocaleDateString("fr-FR")}</small>`:""}</article>`).join("")}
+addProductBtn.onclick=()=>{pDate.value=today();productDialog.showModal()};cancelProduct.onclick=()=>productDialog.close();productForm.onsubmit=e=>{e.preventDefault();upsertProduct({name:pName.value.trim(),supplier:pSupplier.value.trim(),price:Number(pPrice.value),unit:pUnit.value,date:pDate.value||today()});e.target.reset();productDialog.close();renderAll()}
+function upsertProduct(x){let a=loadProducts(),norm=x.name.toLowerCase().trim(),idx=a.findIndex(p=>p.name.toLowerCase().trim()===norm&&p.supplier.toLowerCase().trim()===x.supplier.toLowerCase().trim());if(idx>=0){let p=a[idx],hist=Array.isArray(p.history)?p.history:[];hist.push({date:x.date,price:x.price});a[idx]={...p,price:x.price,unit:x.unit,priceDate:x.date,history:hist}}else a.push({id:"p"+Date.now()+Math.random().toString(16).slice(2),name:x.name,supplier:x.supplier,price:x.price,unit:x.unit,priceDate:x.date,history:[{date:x.date,price:x.price}]});saveProducts(a)}
+function renderSubs(){subrecipeList.innerHTML=loadSubs().map(s=>{let up=subUnitPrice(s.id),y=subYield(s);return`<article class="recipe"><div class="recipe-head"><h3>${esc(s.name)}</h3><span class="badge ${up?"green":"yellow"}">${up?euro(up.price)+"/"+up.unit:"À chiffrer"}</span></div><p class="muted">Rendement : ${y.q} ${y.unit}</p><button class="editSub" data-id="${s.id}">Ouvrir / modifier</button></article>`}).join("");document.querySelectorAll(".editSub").forEach(b=>b.onclick=()=>openSub(b.dataset.id))}
+function openSub(id){let s=loadSubs().find(x=>x.id===id);if(!s)return;let y=subYield(s);subId.value=s.id;subName.value=s.name;subYield.value=y.q||1000;subYieldUnit.value=y.unit||"g";subIngredientRows.innerHTML="";(s.ingredients||[]).forEach(i=>subIngredientRows.appendChild(row(i)));subDialog.showModal();subLive()}
+function subLive(){if(!document.querySelector("#subDialog[open]"))return;let ings=readRows("#subIngredientRows .ingrow"),total=0,missing=!ings.length;for(const i of ings){let c=ingredientCost(i);if(c==null)missing=true;else total+=c}let q=Number(subYield.value)||0,u=subYieldUnit.value,den=(u==="g"||u==="ml")?q/1000:q,base=(u==="g"||u==="kg")?"kg":"L",up=!missing&&den>0?total/den:null;subMetrics.innerHTML=`<b>Calcul sous-recette</b><span>Coût du lot : ${missing?"incomplet":euro(total)}</span><span>Coût au ${base} : ${up==null?"—":euro(up)+"/"+base}</span>`}
+addSubIngredient.onclick=()=>{subIngredientRows.appendChild(row());subLive()};cancelSub.onclick=()=>subDialog.close();subYield.addEventListener("input",subLive);subYieldUnit.addEventListener("change",subLive);subForm.onsubmit=e=>{e.preventDefault();let a=loadSubs(),idx=a.findIndex(x=>x.id===subId.value);if(idx<0)return;let q=Number(subYield.value),u=subYieldUnit.value;a[idx]={...a[idx],name:subName.value.trim(),yieldQty:q,yieldUnit:u,yieldG:u==="g"?q:undefined,ingredients:readRows("#subIngredientRows .ingrow")};saveSubs(a);subDialog.close();renderAll()}
+
+let pendingInvoiceFile=null;
+function selectInvoiceFile(file){if(!file)return;pendingInvoiceFile=file;invoicePreview.innerHTML=`<div class="previewbox"><b>${esc(file.name)}</b><span>${Math.max(1,Math.round(file.size/1024))} Ko</span>${file.type.startsWith("image/")?`<img id="invImg" alt="Aperçu facture">`:"<p>PDF sélectionné</p>"}</div>`;if(file.type.startsWith("image/")){let url=URL.createObjectURL(file);setTimeout(()=>{let im=document.querySelector("#invImg");if(im)im.src=url},0)}newInvoiceBtn.classList.remove("hidden")}
+invoiceInput.onchange=()=>selectInvoiceFile(invoiceInput.files?.[0]);invoiceCamera.onchange=()=>selectInvoiceFile(invoiceCamera.files?.[0]);newInvoiceBtn.onclick=()=>{invDate.value=today();invSupplier.value="";invRef.value="";invoiceRows.innerHTML="";invoiceRows.appendChild(invoiceRow());invoiceDialog.showModal()};cancelInvoice.onclick=()=>invoiceDialog.close();
+function invoiceRow(){let d=document.createElement("div");d.className="invrow";d.innerHTML=`<input class="vName" placeholder="Produit"><div class="inggrid"><input class="vPrice" type="number" min="0" step=".001" placeholder="Prix HT"><select class="vUnit"><option value="kg">€/kg</option><option value="L">€/L</option><option value="piece">€/pièce</option></select></div><button type="button" class="remove">Supprimer</button>`;d.querySelector(".remove").onclick=()=>d.remove();return d}addInvoiceRow.onclick=()=>invoiceRows.appendChild(invoiceRow());
+invoiceForm.onsubmit=e=>{e.preventDefault();let supplier=invSupplier.value.trim(),date=invDate.value,lines=[...document.querySelectorAll(".invrow")].map(d=>({name:d.querySelector(".vName").value.trim(),price:Number(d.querySelector(".vPrice").value),unit:d.querySelector(".vUnit").value})).filter(x=>x.name&&x.price>0);if(!lines.length){alert("Ajoute au moins un produit avec son prix.");return}lines.forEach(x=>upsertProduct({...x,supplier,date}));let inv=jsonGet(IK,[]);inv.unshift({id:"inv"+Date.now(),supplier,date,ref:invRef.value.trim(),fileName:pendingInvoiceFile?.name||"",lines});jsonSet(IK,inv);invoiceDialog.close();pendingInvoiceFile=null;invoicePreview.innerHTML="";newInvoiceBtn.classList.add("hidden");renderAll()}
+function renderInvoices(){let a=jsonGet(IK,[]);invoiceCount.textContent=a.length;invoiceList.innerHTML=a.length?a.map(x=>`<article class="recipe"><div class="recipe-head"><h3>${esc(x.supplier)}</h3><span class="pill">${x.lines.length} ligne${x.lines.length>1?"s":""}</span></div><p class="muted">${new Date(x.date+"T12:00:00").toLocaleDateString("fr-FR")}${x.ref?" · "+esc(x.ref):""}</p>${x.fileName?`<small>Source : ${esc(x.fileName)}</small>`:""}</article>`).join(""):`<p class="empty">Aucune facture validée dans cette version.</p>`}
+function loadStock(){return jsonGet(STK,{date:null,items:{}})}
+function renderInventory(){let st=loadStock(),ps=loadProducts(),total=0;inventoryList.innerHTML=ps.map(p=>{let q=Number(st.items?.[p.id])||0,v=q*p.price;total+=v;return`<article class="inventoryrow"><div><b>${esc(p.name)}</b><small>${esc(p.supplier)} · ${euro(p.price)}/${p.unit}</small></div><div class="stockinput"><input type="number" min="0" step=".01" data-pid="${p.id}" value="${q||""}" placeholder="0"><span>${p.unit}</span></div><strong class="stockvalue">${euro(v)}</strong></article>`}).join("");inventoryValue.textContent=euro(total);inventoryDate.textContent=st.date?"Dernier inventaire : "+new Date(st.date).toLocaleString("fr-FR"):"Aucun inventaire enregistré";document.querySelectorAll(".stockinput input").forEach(i=>i.oninput=inventoryLive)}
+function inventoryLive(){let total=0;document.querySelectorAll(".inventoryrow").forEach(r=>{let inp=r.querySelector("input"),p=product(inp.dataset.pid),v=(Number(inp.value)||0)*(p?.price||0);r.querySelector(".stockvalue").textContent=euro(v);total+=v});inventoryValue.textContent=euro(total)}
+startInventoryBtn.onclick=()=>{if(confirm("Mettre toutes les quantités à zéro pour commencer un nouvel inventaire ?")){document.querySelectorAll(".stockinput input").forEach(i=>i.value="");inventoryLive()}};saveInventoryBtn.onclick=()=>{let items={};document.querySelectorAll(".stockinput input").forEach(i=>items[i.dataset.pid]=Number(i.value)||0);jsonSet(STK,{date:new Date().toISOString(),items});renderInventory();alert("Inventaire enregistré sur cet appareil.")}
+plateInput.onchange=()=>plateStatus.textContent=plateInput.files?.[0]?`Photo sélectionnée : ${plateInput.files[0].name}. Analyse IA non connectée pour le moment.`:"";
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button,.panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelector("#"+b.dataset.tab).classList.add("active")});
-const dlg=document.querySelector("#recipeDialog");document.querySelector("#addRecipeBtn").onclick=()=>dlg.showModal();document.querySelector("#cancelRecipe").onclick=()=>dlg.close();document.querySelector("#recipeForm").onsubmit=e=>{e.preventDefault();let n=document.querySelector("#rName").value.trim();if(!n)return;let a=load();a.push({id:"r"+Date.now(),name:n,salePrice:Number(document.querySelector("#rSale").value)||null,notes:document.querySelector("#rNotes").value.trim(),ingredients:[]});save(a);e.target.reset();dlg.close();render()};
-function fileStatus(i,s,label){if(i)i.onchange=()=>s.textContent=i.files?.[0]?`${label} sélectionné : ${i.files[0].name}`:""}
-fileStatus(document.querySelector("#invoiceInput"),document.querySelector("#invoiceStatus"),"Fichier");fileStatus(document.querySelector("#plateInput"),document.querySelector("#plateStatus"),"Photo");
-
-function renderSubs(){
- const box=document.querySelector("#subrecipeList"); if(!box)return;
- box.innerHTML=loadSubs().map(s=>{let pk=subCostPerKg(s.id);return `<article class="recipe"><div class="recipe-head"><h3>${esc(s.name)}</h3><span class="badge ${pk==null?"yellow":"green"}">${pk==null?"À chiffrer":euro(pk)+"/kg"}</span></div><p class="muted">Rendement : ${Number(s.yieldG)||0} g</p><button class="editSub" data-id="${s.id}">Ouvrir / modifier</button></article>`}).join("");
- box.querySelectorAll(".editSub").forEach(b=>b.onclick=()=>openSub(b.dataset.id));
-}
-function subRow(i={name:"",qty:"",unit:"g",productId:"",manualPrice:"",status:""}){
- let d=row(i); d.classList.add("subingrow"); return d;
-}
-const subDlg=document.querySelector("#subDialog");
-function openSub(id){
- let s=loadSubs().find(x=>x.id===id); if(!s)return;
- document.querySelector("#subId").value=s.id;document.querySelector("#subName").value=s.name;document.querySelector("#subYield").value=s.yieldG||1000;
- let box=document.querySelector("#subIngredientRows");box.innerHTML="";(s.ingredients||[]).forEach(i=>box.appendChild(subRow(i)));
- subLive();subDlg.showModal();
-}
-function subReadRows(){
- return [...document.querySelectorAll("#subIngredientRows .ingrow")].map(d=>{
-   let raw=d.querySelector(".iProduct").value;
-   return {name:d.querySelector(".iName").value.trim(),qty:Number(d.querySelector(".iQty").value)||0,unit:d.querySelector(".iUnit").value,productId:raw.startsWith("sub:")?"":raw,subrecipeId:raw.startsWith("sub:")?raw.slice(4):"",manualPrice:d.querySelector(".iPrice").value?Number(d.querySelector(".iPrice").value):null,status:d.querySelector(".iStatus").value.trim()}
- }).filter(i=>i.name)
-}
-function subLive(){
- let yieldG=Number(document.querySelector("#subYield").value)||0, ings=subReadRows(), total=0, missing=!ings.length;
- for(const i of ings){let c=ingredientCost(i);if(c==null)missing=true;else total+=c}
- let pk=(!missing&&yieldG>0)?total/(yieldG/1000):null;
- document.querySelector("#subMetrics").innerHTML=`<b>Calcul sous-recette</b><span>Coût du lot : ${missing?"incomplet":euro(total)}</span><span>Coût au kg : ${pk==null?"—":euro(pk)+"/kg"}</span>`;
-}
-document.querySelector("#addSubIngredient").onclick=()=>{document.querySelector("#subIngredientRows").appendChild(subRow());subLive()};
-document.querySelector("#cancelSub").onclick=()=>subDlg.close();
-document.querySelector("#subYield").addEventListener("input",subLive);
-document.querySelector("#subForm").onsubmit=e=>{
- e.preventDefault();let a=loadSubs(),id=document.querySelector("#subId").value,idx=a.findIndex(x=>x.id===id);if(idx<0)return;
- a[idx]={...a[idx],name:document.querySelector("#subName").value.trim(),yieldG:Number(document.querySelector("#subYield").value)||1000,ingredients:subReadRows()};
- saveSubs(a);subDlg.close();renderSubs();render();
-};
-renderSubs();
-
-render();if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{});
+function renderAll(){renderRecipes();renderProducts();renderSubs();renderInvoices();renderInventory()}
+renderAll();if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{});
