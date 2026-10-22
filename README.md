@@ -1,4 +1,9 @@
-# FOOD COST V6.4
-Test OCR local amélioré : la photo est agrandie, passée en niveaux de gris et contrastée avant Tesseract.
-Le parseur V6.3 reste chargé. Aucune donnée localStorage n'est effacée et aucun prix n'est validé automatiquement.
-Téléverser ces 4 fichiers à la racine sans supprimer les fichiers existants.
+# FOOD COST V6.5
+Garde le prétraitement OCR V6.4 qui a permis de lire correctement 10,6 / 13,00 et 10 / 11,50.
+Le nouveau filtre :
+- privilégie Date facture et ignore Échéance ;
+- récupère les fournisseurs connus ;
+- conserve les lignes produits reconnues ;
+- rejette les lignes OCR incohérentes ;
+- exige toujours une validation humaine avant enregistrement.
+Aucune donnée localStorage n'est réinitialisée.
