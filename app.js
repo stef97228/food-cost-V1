@@ -20,3 +20,12 @@ function plateSelected(i){document.getElementById('plateStatus').textContent=i.f
 const saved=JSON.parse(localStorage.getItem('foodCostRecipes')||'[]');document.getElementById('recipeCount').textContent=1+saved.length;
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 // FOOD COST V1
+const recipeList = document.querySelector('#recipes');
+if (recipeList && saved.length) {
+  saved.forEach(r => {
+  const card = document.createElement('div');
+  card.className = 'recipe-card';
+  card.innerHTML = '<strong>' + r.name + '</strong>';
+  recipeList.appendChild(card);
+    });
+  }
