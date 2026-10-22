@@ -1,28 +1,11 @@
-# FOOD COST V5.9
+# FOOD COST — V6.0
 
-Version locale-first pour GitHub Pages.
+Version de finalisation locale avant connexion à une IA payante.
 
-Nouveautés :
-- Scan plat / Recette réellement utilisable sans API payante.
-- Photo du plat fini avec aperçu.
-- Choix d'une recette existante ou création d'une nouvelle recette.
-- Saisie/correction des composants et grammages.
-- Liaison aux produits fournisseurs ou sous-recettes et calcul du coût quand les prix existent.
-- Validation obligatoire avant enregistrement.
-- Photo conservée localement sur l'appareil quand la capacité de stockage le permet.
-- Factures : si l'OCR ne trouve pas la date, la date reste vide au lieu d'utiliser automatiquement la date du jour.
-
-Les clés localStorage existantes de V5.5 sont conservées afin de ne pas effacer les recettes, produits, factures et inventaires déjà présents.
-
-
-V5.7 : formulaire Scan plat visible sans photo, photo facultative, suppression manuelle des faux produits/doublons du catalogue.
-
-
-V5.9 : correction du sélecteur Scan plat sur iPhone/Safari. La liste est reconstruite à chaque ouverture de l’onglet et contient toujours « + Nouvelle recette » puis les recettes locales existantes. La sélection d’une recette charge automatiquement ses composants.
-
-
-## V5.9
-- Scan plat placé en premier onglet et ouvert par défaut.
-- Données locales et clés localStorage inchangées.
-- Suppression des faux produits reste manuelle pour éviter toute perte de vraies données.
-- Cache PWA incrémenté.
+- Scan plat en premier et relié aux recettes existantes.
+- Factures : validation explicite, correction manuelle et suppression sécurisée des factures de test.
+- Lors de la suppression d’une facture test, FOOD COST peut proposer de retirer uniquement les produits correspondants qui ne sont utilisés dans aucune recette/sous-recette.
+- Sauvegarde/restauration JSON des données locales.
+- Recettes, sous-recettes, fournisseurs, coûts, coefficients, ratios, inventaire et historique conservés.
+- Aucune API IA payante connectée.
+- Les clés localStorage existantes sont conservées : pas de remise à zéro automatique.
