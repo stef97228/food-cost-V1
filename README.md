@@ -1,4 +1,4 @@
-# FOOD COST V5.8
+# FOOD COST V5.9
 
 Version locale-first pour GitHub Pages.
 
@@ -18,4 +18,11 @@ Les clés localStorage existantes de V5.5 sont conservées afin de ne pas efface
 V5.7 : formulaire Scan plat visible sans photo, photo facultative, suppression manuelle des faux produits/doublons du catalogue.
 
 
-V5.8 : correction du sélecteur Scan plat sur iPhone/Safari. La liste est reconstruite à chaque ouverture de l’onglet et contient toujours « + Nouvelle recette » puis les recettes locales existantes. La sélection d’une recette charge automatiquement ses composants.
+V5.9 : correction du sélecteur Scan plat sur iPhone/Safari. La liste est reconstruite à chaque ouverture de l’onglet et contient toujours « + Nouvelle recette » puis les recettes locales existantes. La sélection d’une recette charge automatiquement ses composants.
+
+
+## V5.9
+- Scan plat placé en premier onglet et ouvert par défaut.
+- Données locales et clés localStorage inchangées.
+- Suppression des faux produits reste manuelle pour éviter toute perte de vraies données.
+- Cache PWA incrémenté.

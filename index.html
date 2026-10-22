@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="./styles.css?v=16">
 </head>
 <body>
-<header><strong>FOOD COST</strong><span>V5.8</span></header>
+<header><strong>FOOD COST</strong><span>V5.9</span></header>
 <main>
   <h1>Tableau de bord</h1>
   <p class="sub">Coûts matières, recettes, fournisseurs et inventaire.</p>
@@ -22,15 +22,15 @@
     <div><b id="alertCount">0</b><small>Alertes</small></div>
   </section>
   <nav>
-    <button class="active" data-tab="recipes">Recettes</button>
+    <button class="active" data-tab="scan">📸 Scan plat</button>
+    <button data-tab="recipes">Recettes</button>
     <button data-tab="suppliers">Fournisseurs</button>
     <button data-tab="subrecipes">Sous-recettes</button>
     <button data-tab="invoices">Factures</button>
     <button data-tab="inventory">Inventaire</button>
-    <button data-tab="scan">Scan plat</button>
   </nav>
 
-  <section id="recipes" class="panel active"><h2>Recettes</h2><div id="recipeList"></div><button id="addRecipeBtn" class="primary">+ Ajouter une recette</button><p class="legend">Coefficient : 🟢 ≥ 4 · 🟡 3 à 3,99 · 🔴 &lt; 3</p></section>
+  <section id="recipes" class="panel"><h2>Recettes</h2><div id="recipeList"></div><button id="addRecipeBtn" class="primary">+ Ajouter une recette</button><p class="legend">Coefficient : 🟢 ≥ 4 · 🟡 3 à 3,99 · 🔴 &lt; 3</p></section>
   <section id="suppliers" class="panel"><div class="sectionhead"><h2>Fournisseurs</h2><button id="addProductBtn">+ Produit</button></div><div id="productList"></div></section>
   <section id="subrecipes" class="panel"><h2>Sous-recettes</h2><div id="subrecipeList"></div></section>
 
@@ -60,7 +60,7 @@
     <div id="inventoryHistory"></div>
   </section>
 
-  <section id="scan" class="panel"><h2>Scan plat / Recette</h2><div class="card"><p><b>📸 Photo du plat fini</b></p><p class="muted">Mode test sans IA payante : ajoute la photo, choisis une recette existante ou crée une nouvelle fiche, puis saisis/corrige les composants et grammages avant validation.</p><label class="file">📷 Prendre une photo<input id="plateInput" type="file" accept="image/*" capture="environment"></label><label class="file secondaryfile">Choisir une photo<input id="plateGallery" type="file" accept="image/*"></label><div id="platePreview"></div><div id="plateBuilder"><label>Recette<select id="plateRecipeSelect"><option value="new">+ Nouvelle recette</option></select></label><label>Nom du plat<input id="plateRecipeName" placeholder="Nom de la recette"></label><h3>Composants / grammages</h3><p class="muted small">Aucune quantité n’est devinée automatiquement. Saisis ce que tu constates et valide seulement quand la fiche est correcte.</p><div id="plateRows"></div><button type="button" id="addPlateRow">+ Ajouter un composant</button><div id="plateMetrics" class="metrics"></div><button type="button" id="savePlateBtn" class="primary">Enregistrer dans la recette</button></div><p id="plateStatus" class="muted"></p></div></section>
+  <section id="scan" class="panel active"><h2>Scan plat / Recette</h2><div class="card"><p><b>📸 Photo du plat fini</b></p><p class="muted">Mode test sans IA payante : ajoute la photo, choisis une recette existante ou crée une nouvelle fiche, puis saisis/corrige les composants et grammages avant validation.</p><label class="file">📷 Prendre une photo<input id="plateInput" type="file" accept="image/*" capture="environment"></label><label class="file secondaryfile">Choisir une photo<input id="plateGallery" type="file" accept="image/*"></label><div id="platePreview"></div><div id="plateBuilder"><label>Recette<select id="plateRecipeSelect"><option value="new">+ Nouvelle recette</option></select></label><label>Nom du plat<input id="plateRecipeName" placeholder="Nom de la recette"></label><h3>Composants / grammages</h3><p class="muted small">Aucune quantité n’est devinée automatiquement. Saisis ce que tu constates et valide seulement quand la fiche est correcte.</p><div id="plateRows"></div><button type="button" id="addPlateRow">+ Ajouter un composant</button><div id="plateMetrics" class="metrics"></div><button type="button" id="savePlateBtn" class="primary">Enregistrer dans la recette</button></div><p id="plateStatus" class="muted"></p></div></section>
 </main>
 
 <dialog id="recipeDialog"><form id="recipeForm"><h2>Nouvelle recette</h2><label>Nom<input id="rName" required></label><label>Prix de vente TTC (€)<input id="rSale" type="number" min="0" step="0.01" placeholder="Optionnel"></label><label>Notes / composition<textarea id="rNotes" rows="4"></textarea></label><div class="actions"><button type="button" id="cancelRecipe">Annuler</button><button class="primary" type="submit">Enregistrer</button></div></form></dialog>
