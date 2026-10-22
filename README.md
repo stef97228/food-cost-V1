@@ -1,10 +1,15 @@
-# FOOD COST V5.4
+# FOOD COST V5.5 — Validation manuelle des factures
 
-Correctif OCR factures :
-- filtre les téléphones, e-mails, adresses, TVA, totaux et informations administratives ;
-- normalise les fournisseurs connus (ex. MARCHE CARAIBES) ;
-- conserve uniquement des lignes produit plausibles ;
-- contrôle de cohérence quantité × prix lorsque le total de ligne est détecté ;
-- aucune modification de prix sans validation humaine.
+Cette version conserve les données locales existantes (recettes, produits, sous-recettes, factures et inventaires).
 
-Les données locales V5.3 restent compatibles.
+## Nouveautés V5.5
+- fiche facture entièrement modifiable avant validation ;
+- correction manuelle du fournisseur, de la date et du numéro ;
+- correction/suppression/ajout des lignes produit ;
+- rapprochement indicatif avec le catalogue existant ;
+- affichage ancien prix, nouveau prix et variation en % ;
+- aucune mise à jour du catalogue avant confirmation finale ;
+- meilleure priorité à la date de facture par rapport à la date d’échéance ;
+- OCR local toujours marqué expérimental.
+
+Déploiement : remplacer les fichiers du dépôt GitHub Pages, commit sur `principal`, puis ouvrir avec `?update=55`.
