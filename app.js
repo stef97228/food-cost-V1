@@ -107,11 +107,31 @@ let pendingPlatePhoto="";
 function plateIngredientRow(i={}){let d=document.createElement("div");d.className="plate-row";let ps=loadProducts(),subs=loadSubs();d.innerHTML=`<label>Composant<input class="plName" value="${esc(i.name||"")}" placeholder="Ex. mozzarella"></label><div class="inggrid"><label>Quantité<input class="plQty" type="number" min="0" step=".1" value="${i.qty??""}" placeholder="0"></label><label>Unité<select class="plUnit"><option value="g">g</option><option value="kg">kg</option><option value="ml">ml</option><option value="L">L</option><option value="piece">pièce</option></select></label></div><label>Lier à<select class="plLink"><option value="">Prix non lié</option><optgroup label="Produits fournisseurs">${ps.map(p=>`<option value="p:${p.id}">${esc(p.name)} — ${euro(p.price)}/${p.unit}</option>`).join("")}</optgroup><optgroup label="Sous-recettes">${subs.map(x=>`<option value="s:${x.id}">${esc(x.name)}</option>`).join("")}</optgroup></select></label><small class="plCost muted">À vérifier</small><button type="button" class="remove">Supprimer</button>`;d.querySelector(".plUnit").value=i.unit||"g";let link=i.productId?`p:${i.productId}`:i.subrecipeId?`s:${i.subrecipeId}`:"";d.querySelector(".plLink").value=link;d.querySelector(".remove").onclick=()=>{d.remove();plateLive()};d.addEventListener("input",plateLive);d.addEventListener("change",plateLive);return d}
 function readPlateRows(){return[...document.querySelectorAll("#plateRows .plate-row")].map(d=>{let link=d.querySelector(".plLink").value;return{name:d.querySelector(".plName").value.trim(),qty:Number(d.querySelector(".plQty").value)||0,unit:d.querySelector(".plUnit").value,productId:link.startsWith("p:")?link.slice(2):"",subrecipeId:link.startsWith("s:")?link.slice(2):"",manualPrice:null,status:"à valider depuis photo"}}).filter(x=>x.name||x.qty)}
 function plateLive(){let rows=readPlateRows(),total=0,missing=!rows.length;document.querySelectorAll("#plateRows .plate-row").forEach((d,n)=>{let c=rows[n]?ingredientCost(rows[n]):null;d.querySelector(".plCost").textContent=c==null?"Prix manquant / liaison à vérifier":`Coût estimé : ${euro(c)}`;if(c==null)missing=true;else total+=c});plateMetrics.innerHTML=`<b>Coût matière de la proposition</b><span>${missing?"Incomplet — lie les composants aux produits/sous-recettes":euro(total)}</span><span>Les grammages restent à valider manuellement.</span>`}
-function renderPlateRecipeOptions(){let rs=loadRecipes();plateRecipeSelect.innerHTML=`<option value="new">+ Nouvelle recette</option>${rs.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join("")}`}
+function renderPlateRecipeOptions(){
+  if(!plateRecipeSelect)return;
+  const current=plateRecipeSelect.value||"new";
+  const rs=loadRecipes();
+  plateRecipeSelect.replaceChildren();
+  plateRecipeSelect.add(new Option("+ Nouvelle recette","new"));
+  rs.forEach(r=>plateRecipeSelect.add(new Option(r.name||"Recette sans nom",r.id)));
+  plateRecipeSelect.value=rs.some(r=>r.id===current)?current:"new";
+  plateStatus.textContent=rs.length?`${rs.length} recette(s) disponible(s). Choisis une recette existante ou crée-en une nouvelle.`:"Aucune recette existante détectée. Tu peux créer une nouvelle recette.";
+}
 function loadPlateRecipe(){let id=plateRecipeSelect.value;plateRows.innerHTML="";if(id==="new"){plateRecipeName.value="";plateRows.appendChild(plateIngredientRow());}else{let r=loadRecipes().find(x=>x.id===id);plateRecipeName.value=r?.name||"";(r?.ingredients?.length?r.ingredients:[{}]).forEach(i=>plateRows.appendChild(plateIngredientRow(i)))}plateLive()}
 function selectPlateFile(file){if(!file)return;pendingPlatePhoto="";platePreview.innerHTML="";let rd=new FileReader();rd.onload=()=>{pendingPlatePhoto=rd.result;platePreview.innerHTML=`<img class="plate-photo" src="${rd.result}" alt="Photo du plat">`;plateBuilder.classList.remove("hidden");renderPlateRecipeOptions();loadPlateRecipe();plateStatus.textContent="Photo prête. L’IA n’est pas connectée : corrige ou saisis les composants avant d’enregistrer."};rd.readAsDataURL(file)}
 plateInput.onchange=()=>selectPlateFile(plateInput.files?.[0]);plateGallery.onchange=()=>selectPlateFile(plateGallery.files?.[0]);plateRecipeSelect.onchange=loadPlateRecipe;addPlateRow.onclick=()=>{plateRows.appendChild(plateIngredientRow());plateLive()};
 savePlateBtn.onclick=()=>{let name=plateRecipeName.value.trim(),ings=readPlateRows();if(!name){alert("Indique le nom de la recette.");return}if(!ings.length){alert("Ajoute au moins un composant.");return}if(!confirm("Enregistrer cette fiche et ses composants dans la recette ?\n\nLa photo est facultative et les grammages restent sous ta validation."))return;let rs=loadRecipes(),id=plateRecipeSelect.value;if(id==="new"){id="r"+Date.now();rs.push({id,name,salePrice:null,notes:"Créée depuis le scan du plat — grammages à valider",ingredients:ings})}else{let n=rs.findIndex(r=>r.id===id);if(n<0)return;rs[n]={...rs[n],name,ingredients:ings}}saveRecipes(rs);let photos=jsonGet(PLK,{});if(pendingPlatePhoto)photos[id]={dataUrl:pendingPlatePhoto,date:new Date().toISOString()};try{jsonSet(PLK,photos)}catch(e){plateStatus.textContent="Recette enregistrée, mais la photo est trop lourde pour le stockage local. La fiche recette est conservée."}renderAll();plateStatus.textContent="Recette enregistrée. Tu peux maintenant l’ouvrir dans Recettes pour compléter les prix et le prix de vente.";};
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button,.panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelector("#"+b.dataset.tab).classList.add("active")});
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button,.panel").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  document.querySelector("#"+b.dataset.tab).classList.add("active");
+  if(b.dataset.tab==="scan"){renderPlateRecipeOptions();loadPlateRecipe();}
+});
 function renderAll(){renderRecipes();renderProducts();renderSubs();renderInvoices();renderInventory()}
-renderAll();plateBuilder.classList.remove("hidden");renderPlateRecipeOptions();loadPlateRecipe();if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{});
+// Initialise le Scan plat indépendamment des autres modules : ainsi une erreur
+// d'affichage ailleurs ne peut pas vider la liste des recettes sur iPhone/Safari.
+plateBuilder.classList.remove("hidden");
+renderPlateRecipeOptions();
+loadPlateRecipe();
+renderAll();
+if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{});
