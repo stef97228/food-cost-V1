@@ -1,4 +1,4 @@
-# FOOD COST V5.6
+# FOOD COST V5.7
 
 Version locale-first pour GitHub Pages.
 
@@ -13,3 +13,6 @@ Nouveautés :
 - Factures : si l'OCR ne trouve pas la date, la date reste vide au lieu d'utiliser automatiquement la date du jour.
 
 Les clés localStorage existantes de V5.5 sont conservées afin de ne pas effacer les recettes, produits, factures et inventaires déjà présents.
+
+
+V5.7 : formulaire Scan plat visible sans photo, photo facultative, suppression manuelle des faux produits/doublons du catalogue.
