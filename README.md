@@ -1,5 +1,12 @@
-# FOOD COST V1 propre
+# FOOD COST V1
 
-Version de remplacement : ajout de recettes avec nom et stockage local, compteur automatique, recette Caponne, 11 produits fournisseurs, PWA avec cache v2.
+Version complète statique/PWA pour GitHub Pages.
 
-OCR/IA, cloud et authentification ne sont pas encore actifs.
+- Recettes enregistrées sur l'appareil (localStorage)
+- Catalogue fournisseurs initial
+- Compteur recettes/produits
+- Navigation Recettes / Fournisseurs / Factures / Scan plat
+- Mise en page coefficient
+- Cache PWA versionné pour faciliter les mises à jour
+
+Important : l'OCR/IA des factures et des plats n'est pas actif dans cette version statique. Il nécessitera un backend sécurisé et une validation humaine avant modification des prix/grammages.

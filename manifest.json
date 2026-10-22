@@ -3,13 +3,14 @@
   "short_name": "FOOD COST",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f5f6f8",
-  "theme_color": "#0d1728",
+  "background_color": "#f4f6f9",
+  "theme_color": "#0f1728",
   "icons": [
     {
       "src": "icon.svg",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }

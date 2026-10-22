@@ -1,1 +1,81 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0d1728"><title>FOOD COST</title><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css"></head><body><header><b>FOOD COST</b><span>V1</span></header><main><h1>Tableau de bord</h1><p class="muted">Coûts matières, recettes et fournisseurs.</p><section class="stats"><div><b id="recipeCount">1</b><small>Recette</small></div><div><b id="productCount">11</b><small>Produits</small></div><div><b>0</b><small>Alerte</small></div></section><nav><button class="active" data-tab="recipes">Recettes</button><button data-tab="suppliers">Fournisseurs</button><button data-tab="invoices">Factures</button><button data-tab="scan">Scan plat</button></nav><section id="recipes" class="panel active"><h2>Recettes</h2><article class="card"><h3>Escalope de poulet Caponne <em>À chiffrer</em></h3><p>Cuisse de poulet désossée · 190 g cru</p><p>Panure anglaise, sauce gorgonzola, mozzarella, penne crème parmesan-ail, copeaux de parmesan, persil.</p><aside>Le prix de la cuisse de poulet n’est pas encore renseigné. Aucun prix de filet de poulet ne sera substitué.</aside></article><div id="recipeList"></div><button class="primary" id="addRecipeBtn">+ Ajouter une recette</button><p class="legend">Coefficient : 🟢 ≥ 4 · 🟡 3 à 3,99 · 🔴 &lt; 3</p></section><section id="suppliers" class="panel"><h2>Fournisseurs</h2><div id="products"></div></section><section id="invoices" class="panel"><h2>Factures</h2><p>Import/scan et validation : prochaine étape.</p></section><section id="scan" class="panel"><h2>Scan plat</h2><p>Analyse photo assistée par IA : prochaine étape. Les grammages devront être validés.</p></section></main><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0f1728">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>FOOD COST</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon.svg">
+  <link rel="stylesheet" href="./styles.css?v=3">
+</head>
+<body>
+<header><strong>FOOD COST</strong><span>V1</span></header>
+<main>
+  <h1>Tableau de bord</h1>
+  <p class="sub">Coûts matières, recettes et fournisseurs.</p>
+
+  <section class="stats">
+    <div><b id="recipeCount">1</b><small>Recette</small></div>
+    <div><b id="productCount">11</b><small>Produits</small></div>
+    <div><b id="alertCount">0</b><small>Alerte</small></div>
+  </section>
+
+  <nav>
+    <button class="active" data-tab="recipes">Recettes</button>
+    <button data-tab="suppliers">Fournisseurs</button>
+    <button data-tab="invoices">Factures</button>
+    <button data-tab="scan">Scan plat</button>
+  </nav>
+
+  <section id="recipes" class="panel active">
+    <h2>Recettes</h2>
+    <div id="recipeList"></div>
+    <button id="addRecipeBtn" class="primary">+ Ajouter une recette</button>
+    <p class="legend">Coefficient : 🟢 ≥ 4 · 🟡 3 à 3,99 · 🔴 &lt; 3</p>
+  </section>
+
+  <section id="suppliers" class="panel">
+    <h2>Fournisseurs</h2>
+    <div id="productList"></div>
+  </section>
+
+  <section id="invoices" class="panel">
+    <h2>Factures</h2>
+    <div class="card">
+      <p><b>Import de facture</b></p>
+      <p>Cette V1 conserve les données localement. L’OCR/IA automatique sera connecté ensuite et devra toujours être validé avant d’enregistrer un prix.</p>
+      <label class="file">Choisir une photo/PDF<input id="invoiceInput" type="file" accept="image/*,.pdf"></label>
+      <p id="invoiceStatus"></p>
+    </div>
+  </section>
+
+  <section id="scan" class="panel">
+    <h2>Scan plat</h2>
+    <div class="card">
+      <p><b>Photo du plat</b></p>
+      <p>L’analyse IA des composants et grammages sera une proposition à valider, jamais une modification automatique.</p>
+      <label class="file">Prendre/choisir une photo<input id="plateInput" type="file" accept="image/*" capture="environment"></label>
+      <p id="plateStatus"></p>
+    </div>
+  </section>
+</main>
+
+<dialog id="recipeDialog">
+  <form id="recipeForm">
+    <h2>Nouvelle recette</h2>
+    <label>Nom<input id="rName" required placeholder="Ex. Burger maison"></label>
+    <label>Prix de vente TTC (€)<input id="rSale" type="number" min="0" step="0.01" placeholder="Optionnel"></label>
+    <label>Notes / composition<textarea id="rNotes" rows="4" placeholder="Ingrédients, grammages…"></textarea></label>
+    <div class="actions">
+      <button type="button" id="cancelRecipe">Annuler</button>
+      <button class="primary" type="submit">Enregistrer</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="./app.js?v=3"></script>
+</body>
+</html>
