@@ -9,10 +9,10 @@
   <title>FOOD COST</title>
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icon.svg">
-  <link rel="stylesheet" href="./styles.css?v=12">
+  <link rel="stylesheet" href="./styles.css?v=16">
 </head>
 <body>
-<header><strong>FOOD COST</strong><span>V5.5</span></header>
+<header><strong>FOOD COST</strong><span>V5.6</span></header>
 <main>
   <h1>Tableau de bord</h1>
   <p class="sub">Coûts matières, recettes, fournisseurs et inventaire.</p>
@@ -60,7 +60,7 @@
     <div id="inventoryHistory"></div>
   </section>
 
-  <section id="scan" class="panel"><h2>Scan plat</h2><div class="card"><p><b>Photo du plat</b></p><p>L’analyse IA des composants et grammages sera une proposition à valider, jamais une modification automatique.</p><label class="file">Prendre/choisir une photo<input id="plateInput" type="file" accept="image/*" capture="environment"></label><p id="plateStatus"></p></div></section>
+  <section id="scan" class="panel"><h2>Scan plat / Recette</h2><div class="card"><p><b>📸 Photo du plat fini</b></p><p class="muted">Mode test sans IA payante : ajoute la photo, choisis une recette existante ou crée une nouvelle fiche, puis saisis/corrige les composants et grammages avant validation.</p><label class="file">📷 Prendre une photo<input id="plateInput" type="file" accept="image/*" capture="environment"></label><label class="file secondaryfile">Choisir une photo<input id="plateGallery" type="file" accept="image/*"></label><div id="platePreview"></div><div id="plateBuilder" class="hidden"><label>Recette<select id="plateRecipeSelect"></select></label><label>Nom du plat<input id="plateRecipeName" placeholder="Nom de la recette"></label><h3>Composants / grammages</h3><p class="muted small">Aucune quantité n’est devinée automatiquement. Saisis ce que tu constates et valide seulement quand la fiche est correcte.</p><div id="plateRows"></div><button type="button" id="addPlateRow">+ Ajouter un composant</button><div id="plateMetrics" class="metrics"></div><button type="button" id="savePlateBtn" class="primary">Enregistrer dans la recette</button></div><p id="plateStatus" class="muted"></p></div></section>
 </main>
 
 <dialog id="recipeDialog"><form id="recipeForm"><h2>Nouvelle recette</h2><label>Nom<input id="rName" required></label><label>Prix de vente TTC (€)<input id="rSale" type="number" min="0" step="0.01" placeholder="Optionnel"></label><label>Notes / composition<textarea id="rNotes" rows="4"></textarea></label><div class="actions"><button type="button" id="cancelRecipe">Annuler</button><button class="primary" type="submit">Enregistrer</button></div></form></dialog>
@@ -72,5 +72,5 @@
 <dialog id="invoiceDialog"><form id="invoiceForm"><h2>Validation facture — V5.5</h2><label>Fournisseur<input id="invSupplier" required></label><label>Date facture<input id="invDate" type="date" required></label><label>Référence / N° facture<input id="invRef"></label><h3>Produits lus / saisis</h3><p class="muted small">Corrige librement chaque champ. FOOD COST indique si le produit semble déjà exister et affiche l’ancien prix ainsi que la variation. Rien n’est enregistré avant « Valider la facture ».</p><div id="invoiceRows"></div><button type="button" id="addInvoiceRow">+ Ajouter une ligne</button><div class="actions"><button type="button" id="cancelInvoice">Annuler</button><button class="primary" type="submit">Valider la facture</button></div></form></dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="./app.js?v=15"></script>
+<script src="./app.js?v=16"></script>
 </body></html>

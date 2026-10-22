@@ -1,15 +1,15 @@
-# FOOD COST V5.5 — Validation manuelle des factures
+# FOOD COST V5.6
 
-Cette version conserve les données locales existantes (recettes, produits, sous-recettes, factures et inventaires).
+Version locale-first pour GitHub Pages.
 
-## Nouveautés V5.5
-- fiche facture entièrement modifiable avant validation ;
-- correction manuelle du fournisseur, de la date et du numéro ;
-- correction/suppression/ajout des lignes produit ;
-- rapprochement indicatif avec le catalogue existant ;
-- affichage ancien prix, nouveau prix et variation en % ;
-- aucune mise à jour du catalogue avant confirmation finale ;
-- meilleure priorité à la date de facture par rapport à la date d’échéance ;
-- OCR local toujours marqué expérimental.
+Nouveautés :
+- Scan plat / Recette réellement utilisable sans API payante.
+- Photo du plat fini avec aperçu.
+- Choix d'une recette existante ou création d'une nouvelle recette.
+- Saisie/correction des composants et grammages.
+- Liaison aux produits fournisseurs ou sous-recettes et calcul du coût quand les prix existent.
+- Validation obligatoire avant enregistrement.
+- Photo conservée localement sur l'appareil quand la capacité de stockage le permet.
+- Factures : si l'OCR ne trouve pas la date, la date reste vide au lieu d'utiliser automatiquement la date du jour.
 
-Déploiement : remplacer les fichiers du dépôt GitHub Pages, commit sur `principal`, puis ouvrir avec `?update=55`.
+Les clés localStorage existantes de V5.5 sont conservées afin de ne pas effacer les recettes, produits, factures et inventaires déjà présents.
