@@ -1,4 +1,10 @@
-# FOOD COST V2 — Fiche recette
-Ajoute fiche recette, ingrédients/grammages, coût matière, coefficient, ratio matière, indicateurs, migration des recettes V1 et catalogue fournisseurs.
-Les grammages non confirmés de la Caponne restent marqués « à valider ». Le prix du filet de poulet n'est jamais substitué à celui de la cuisse.
-OCR/IA non actifs dans cette version statique.
+# FOOD COST V3 — Fiche recette complète
+- modification recette, prix de vente, ingrédients et grammages
+- liaison aux produits fournisseurs
+- prix manuel pour les ingrédients non encore au catalogue
+- calcul automatique du coût matière, coefficient et ratio matière
+- couleurs vert/jaune/rouge
+- migration des données locales V2
+- Caponne conservée ; cuisse désossée 190 g confirmée, aucun prix de filet substitué
+- grammages estimés toujours marqués à valider
+OCR/IA reste non actif dans cette version statique.

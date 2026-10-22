@@ -9,10 +9,10 @@
   <title>FOOD COST</title>
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icon.svg">
-  <link rel="stylesheet" href="./styles.css?v=5">
+  <link rel="stylesheet" href="./styles.css?v=6">
 </head>
 <body>
-<header><strong>FOOD COST</strong><span>V2</span></header>
+<header><strong>FOOD COST</strong><span>V3</span></header>
 <main>
   <h1>Tableau de bord</h1>
   <p class="sub">Coûts matières, recettes et fournisseurs.</p>
@@ -32,7 +32,7 @@
 
   <section id="recipes" class="panel active">
     <h2>Recettes</h2>
-    <div id="recipeList"></div><div id="recipeDetail"></div>
+    <div id="recipeList"></div>
     <button id="addRecipeBtn" class="primary">+ Ajouter une recette</button>
     <p class="legend">Coefficient : 🟢 ≥ 4 · 🟡 3 à 3,99 · 🔴 &lt; 3</p>
   </section>
@@ -76,6 +76,24 @@
   </form>
 </dialog>
 
-<script src="./app.js?v=5"></script>
+<dialog id="editDialog">
+  <form id="editForm">
+    <h2>Fiche recette</h2>
+    <input id="editId" type="hidden">
+    <label>Nom<input id="editName" required></label>
+    <label>Prix de vente TTC (€)<input id="editSale" type="number" min="0" step="0.01" placeholder="Optionnel"></label>
+    <label>Notes / composition<textarea id="editNotes" rows="3"></textarea></label>
+    <h3>Ingrédients</h3>
+    <div id="ingredientRows"></div>
+    <button type="button" id="addIngredient">+ Ajouter un ingrédient</button>
+    <div id="liveMetrics" class="metrics"></div>
+    <div class="actions">
+      <button type="button" id="cancelEdit">Annuler</button>
+      <button class="primary" type="submit">Enregistrer la fiche</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="./app.js?v=6"></script>
 </body>
 </html>
