@@ -47,26 +47,32 @@ function normalizeOcrText(t){return String(t||"").replace(/[|¦]/g," ").replace(
 function parseMoney(s){let n=String(s||"").replace(/\s/g,"").replace(",",".").replace(/[^0-9.]/g,"");let v=Number(n);return Number.isFinite(v)?v:null}
 function parseInvoiceText(raw){
   let text=normalizeOcrText(raw), lines=text.split(/\n+/).map(x=>x.trim()).filter(Boolean), out={supplier:"",date:"",ref:"",rows:[],warnings:[]};
-  let supplierLine=lines.find(x=>/MARCHE\s+CARAIBES|VODELYS|WEST\s+INDIES|PRO\s*[AÀ]\s*PRO|BONITEAU|BINO|DCHR/i.test(x));
-  if(supplierLine) out.supplier=supplierLine.replace(/[^A-ZÀ-Ÿ0-9 '&./-]/gi," ").replace(/\s+/g," ").trim().slice(0,80);
+  const knownSuppliers=[
+    [/MARCHE\s+CARAIBES/i,"MARCHE CARAIBES"],[/VODELYS/i,"VODELYS"],[/WEST\s+INDIES/i,"West Indies Trade"],
+    [/PRO\s*[AÀ]\s*PRO/i,"Pro à Pro"],[/BONITEAU|BINO\s+VIANDES/i,"Boniteau / Bino Viandes"],[/DCHR/i,"DCHR"]
+  ];
+  for(const [rx,name] of knownSuppliers){if(rx.test(text)){out.supplier=name;break}}
   let ref=text.match(/FACTURE\s*(?:N[°ºO]?|NO)?\s*[:#-]?\s*([A-Z0-9-]{4,})/i); if(ref)out.ref=ref[1];
   let dm=text.match(/(?:DATE\s*[:.-]?\s*)?(\d{1,2})[\/.-](\d{1,2})[\/.-](20\d{2})/i); if(dm)out.date=`${dm[3]}-${dm[2].padStart(2,"0")}-${dm[1].padStart(2,"0")}`;
-  // Candidate product rows: retain only lines containing a plausible description plus at least 2 numeric values.
+
+  const admin=/\b(?:T[ÉE]L|TEL|T[ÉE]L[ÉE]PHONE|FAX|EMAIL|E-?MAIL|ADRESSE|CLIENT|COMMERCIAL|VENDEUR|CODE\s+CLIENT|SIREN|SIRET|APE|IBAN|BIC|RIB|TVA|TAXE|BASE|TAUX|MONTANT|TOTAL|NET\s*[ÀA]\s*PAYER|RESTE\s*[ÀA]\s*PAYER|[ÉE]CH[ÉE]ANCE|FACTURE|PAGE|PAIEMENT|R[ÈE]GLEMENT|BANQUE|SITE|WWW|\.COM|@)\b/i;
+  const phone=/\b(?:\+?33|0)?\s*[1-9](?:[ .-]?\d{2}){4}\b|\b(?:0596|0590|0696|0690)\b/i;
+  const address=/\b(?:RUE|ROUTE|CHEMIN|AVENUE|BD|BOULEVARD|ZI|ZA|LOT|MARTINIQUE|LAMENTIN|FORT[- ]DE[- ]FRANCE|SAINTE?[- ]?LUCE|SCHOELCHER)\b/i;
   for(let line of lines){
-    if(/TOTAL|TVA|NET\s*[ÀA]\s*PAYER|IBAN|SIREN|FACTURE|ECHEANCE|TAXE/i.test(line))continue;
+    if(admin.test(line)||phone.test(line)||address.test(line))continue;
     let nums=[...line.matchAll(/\b\d+(?:[.,]\d{1,3})?\b/g)].map(m=>({raw:m[0],i:m.index,v:parseMoney(m[0])}));
     if(nums.length<2)continue;
-    let first=nums[0]; let desc=line.slice(0,first.i).replace(/^[A-Z0-9-]{1,12}\s+/i,"").trim();
-    if(desc.length<5||!/[A-Za-zÀ-ÿ]{3}/.test(desc))continue;
-    let values=nums.map(n=>n.v).filter(v=>v!=null);
-    let qty=values[0], price=null, total=null;
-    if(values.length>=3){ price=values[values.length-2]; total=values[values.length-1]; }
-    else { price=values[1]; }
-    if(!(price>0))continue;
-    let unit=/\bKG\b/i.test(line)?"kg":/\bL\b/i.test(line)?"L":/\b(?:PC|PCE|PIECE)\b/i.test(line)?"piece":"kg";
-    out.rows.push({name:desc.slice(0,100),qty:qty>0?qty:"",price,unit,total:total>0?total:null,confidence:"à vérifier",source:line});
+    let first=nums[0];
+    let desc=line.slice(0,first.i).replace(/^[A-Z0-9-]{1,14}\s+/i,"").replace(/[^A-Za-zÀ-ÿ0-9 '\/().+-]/g," ").replace(/\s+/g," ").trim();
+    if(desc.length<5||!/[A-Za-zÀ-ÿ]{3}/.test(desc)||admin.test(desc)||phone.test(desc))continue;
+    let values=nums.map(n=>n.v).filter(v=>v!=null), qty=values[0], price=null, total=null;
+    if(values.length>=3){price=values[values.length-2];total=values[values.length-1]}else price=values[1];
+    if(!(qty>0&&price>0)||qty>1000||price>500)continue;
+    let unit=/\bKG\b/i.test(line)?"kg":/\b(?:LTR|LITRE|L)\b/i.test(line)?"L":/\b(?:PC|PCE|PIECE|UNIT[ÉE]?)\b/i.test(line)?"piece":"kg";
+    // If a total is visible, reject candidates whose arithmetic is wildly inconsistent.
+    if(total>0){let expected=qty*price, ratio=expected/total;if(ratio<0.45||ratio>2.2)continue}
+    out.rows.push({name:desc.slice(0,100),qty,price,unit,total:total>0?total:null,confidence:"à vérifier",source:line});
   }
-  // De-duplicate candidates and cap noisy OCR.
   let seen=new Set(); out.rows=out.rows.filter(r=>{let k=r.name.toLowerCase()+"|"+r.price;if(seen.has(k))return false;seen.add(k);return true}).slice(0,12);
   if(!out.supplier)out.warnings.push("Fournisseur non identifié automatiquement.");
   if(!out.date)out.warnings.push("Date non identifiée automatiquement.");
