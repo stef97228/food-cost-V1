@@ -1,10 +1,8 @@
-# FOOD COST V5.1
+# FOOD COST V5.2
 
-Correctif de compatibilité iPhone/Safari pour le chargement des données locales.
-
-- conserve les clés V4.1 `foodCostRecipesV3` et `foodCostSubrecipesV4`
-- conserve les recettes et sous-recettes existantes dans le navigateur
-- restaure le catalogue fournisseur de base (12 produits)
-- Factures et Inventaire restent disponibles
-- aucun prix fournisseur inventé
-
+- Conservation des recettes, sous-recettes, fournisseurs et factures V5.1.
+- OCR local expérimental des photos de factures (Tesseract.js, connexion internet requise au premier chargement).
+- Aucune donnée OCR ne modifie un prix sans validation humaine.
+- Inventaire multi-unités : kg/g, L/ml, pièce/carton selon le produit.
+- Les unités sans conversion connue affichent « Conversion à définir » au lieu d'inventer une valeur.
+- Historique local des inventaires avec date et valeur totale.
