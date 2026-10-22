@@ -1,8 +1,12 @@
-# FOOD COST V5.2
+# FOOD COST V5.3
 
-- Conservation des recettes, sous-recettes, fournisseurs et factures V5.1.
-- OCR local expérimental des photos de factures (Tesseract.js, connexion internet requise au premier chargement).
-- Aucune donnée OCR ne modifie un prix sans validation humaine.
-- Inventaire multi-unités : kg/g, L/ml, pièce/carton selon le produit.
-- Les unités sans conversion connue affichent « Conversion à définir » au lieu d'inventer une valeur.
-- Historique local des inventaires avec date et valeur totale.
+Amélioration du traitement des factures :
+- OCR local expérimental conservé.
+- Le texte OCR brut est maintenant transformé en proposition structurée : fournisseur, date, numéro de facture et lignes produit candidates.
+- La fiche de validation est préremplie quand les informations sont détectées.
+- Quantité, unité et prix HT restent modifiables avant validation.
+- Confirmation finale obligatoire avant toute mise à jour du catalogue fournisseur.
+- Le texte OCR brut reste consultable pour contrôle.
+- Conservation des recettes, produits, sous-recettes, factures et inventaires stockés localement.
+
+Important : l'OCR peut se tromper. Aucune donnée fournisseur n'est enregistrée automatiquement sans validation humaine.

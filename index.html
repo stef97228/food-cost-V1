@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="./styles.css?v=12">
 </head>
 <body>
-<header><strong>FOOD COST</strong><span>V5.2</span></header>
+<header><strong>FOOD COST</strong><span>V5.3</span></header>
 <main>
   <h1>Tableau de bord</h1>
   <p class="sub">Coûts matières, recettes, fournisseurs et inventaire.</p>
@@ -44,7 +44,8 @@
       <div id="invoicePreview"></div>
       <button id="ocrInvoiceBtn" class="hidden">🔎 Lire le texte de la facture</button>
       <div id="ocrStatus" class="muted small"></div>
-      <textarea id="ocrText" class="hidden" rows="7" placeholder="Texte détecté — à vérifier"></textarea>
+      <div id="ocrStructured" class="hidden"></div>
+      <details id="ocrRawWrap" class="hidden"><summary>Voir le texte OCR brut</summary><textarea id="ocrText" rows="7" placeholder="Texte détecté — à vérifier"></textarea></details>
       <button id="newInvoiceBtn" class="primary hidden">Créer la fiche de validation</button>
     </div>
     <div class="sectionhead"><h3>Historique</h3><span id="invoiceCount" class="pill">0</span></div><div id="invoiceList"></div>
@@ -71,5 +72,5 @@
 <dialog id="invoiceDialog"><form id="invoiceForm"><h2>Validation facture</h2><label>Fournisseur<input id="invSupplier" required></label><label>Date facture<input id="invDate" type="date" required></label><label>Référence / N° facture<input id="invRef"></label><h3>Produits lus / saisis</h3><p class="muted small">Vérifie chaque ligne avant d’enregistrer. Les prix validés alimenteront le catalogue fournisseur.</p><div id="invoiceRows"></div><button type="button" id="addInvoiceRow">+ Ajouter une ligne</button><div class="actions"><button type="button" id="cancelInvoice">Annuler</button><button class="primary" type="submit">Valider la facture</button></div></form></dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="./app.js?v=12"></script>
+<script src="./app.js?v=13"></script>
 </body></html>
