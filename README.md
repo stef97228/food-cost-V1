@@ -1,11 +1,4 @@
-# FOOD COST — V6.1
-
-Correctif OCR factures sur la base V6.0.
-
-- Conserve toutes les clés localStorage V6.0 : aucune remise à zéro.
-- N° de facture détecté avec une règle plus tolérante.
-- Lignes produits récupérées avec contrôle quantité × prix ≈ total.
-- Les lignes ambiguës restent « à vérifier » au lieu d'être enregistrées automatiquement.
-- Filtrage conservé pour téléphone, adresse, TVA, totaux et informations administratives.
-- Aucun prix fournisseur n'est modifié avant validation explicite.
-- Aucune API IA payante connectée.
+# FOOD COST V6.2
+Correctif additif à V6.1 pour reconstruire quantité / prix unitaire / total des lignes OCR.
+Aucune donnée locale n'est réinitialisée et aucun prix n'est enregistré sans validation.
+Téléverser les 4 fichiers à la racine du dépôt, sans supprimer app.js, styles.css, v61-fix.js ni les autres fichiers.
