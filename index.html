@@ -9,10 +9,10 @@
   <title>FOOD COST</title>
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icon.svg">
-  <link rel="stylesheet" href="./styles.css?v=6">
+  <link rel="stylesheet" href="./styles.css?v=7">
 </head>
 <body>
-<header><strong>FOOD COST</strong><span>V3</span></header>
+<header><strong>FOOD COST</strong><span>V4</span></header>
 <main>
   <h1>Tableau de bord</h1>
   <p class="sub">Coûts matières, recettes et fournisseurs.</p>
@@ -25,7 +25,7 @@
 
   <nav>
     <button class="active" data-tab="recipes">Recettes</button>
-    <button data-tab="suppliers">Fournisseurs</button>
+    <button data-tab="suppliers">Fournisseurs</button><button data-tab="subrecipes">Sous-recettes</button>
     <button data-tab="invoices">Factures</button>
     <button data-tab="scan">Scan plat</button>
   </nav>
@@ -94,6 +94,23 @@
   </form>
 </dialog>
 
-<script src="./app.js?v=6"></script>
+<dialog id="subDialog">
+  <form id="subForm">
+    <h2>Sous-recette</h2>
+    <input id="subId" type="hidden">
+    <label>Nom<input id="subName" required></label>
+    <label>Poids final de la préparation (g)<input id="subYield" type="number" min="1" step="1" required></label>
+    <h3>Ingrédients de la préparation</h3>
+    <div id="subIngredientRows"></div>
+    <button type="button" id="addSubIngredient">+ Ajouter un ingrédient</button>
+    <div id="subMetrics" class="metrics"></div>
+    <div class="actions">
+      <button type="button" id="cancelSub">Annuler</button>
+      <button class="primary" type="submit">Enregistrer la sous-recette</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="./app.js?v=7"></script>
 </body>
 </html>

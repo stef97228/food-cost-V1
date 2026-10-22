@@ -2,3 +2,5 @@
 #recipeDetail{margin-top:20px}.openRecipe{width:100%;margin-top:10px}.recipe small{color:#6b7280}.recipe p{line-height:1.45}
 .badge.green{background:#dff7e8;color:#126b36}.badge.yellow{background:#fff0bd;color:#765700}.badge.red{background:#ffe1e1;color:#a22121}
 .costline{display:flex;justify-content:space-between;padding:6px 0}.ingrow{background:#f6f8fb;border-radius:16px;padding:14px;margin:12px 0}.inggrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.ingrow input,.ingrow select{margin:5px 0}.mini{font-size:13px;margin:5px 0}.rowfoot{display:flex;justify-content:space-between;align-items:center}.rowfoot .remove{padding:9px 12px;color:#a22121}.metrics{display:grid;gap:6px;background:#eef2f7;padding:15px;border-radius:16px;margin:18px 0}.metrics b{font-size:18px}.metrics span{display:block}
+
+#subrecipeList{display:grid;gap:14px}.editSub{width:100%;margin-top:10px}#subIngredientRows .ingrow{border:1px solid #dde3ec}

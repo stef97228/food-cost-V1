@@ -1,10 +1,5 @@
-# FOOD COST V3 — Fiche recette complète
-- modification recette, prix de vente, ingrédients et grammages
-- liaison aux produits fournisseurs
-- prix manuel pour les ingrédients non encore au catalogue
-- calcul automatique du coût matière, coefficient et ratio matière
-- couleurs vert/jaune/rouge
-- migration des données locales V2
-- Caponne conservée ; cuisse désossée 190 g confirmée, aucun prix de filet substitué
-- grammages estimés toujours marqués à valider
-OCR/IA reste non actif dans cette version statique.
+# FOOD COST V4 — Sous-recettes
+Ajoute un onglet Sous-recettes avec Sauce gorgonzola et Crème parmesan-ail.
+Chaque sous-recette possède son rendement et ses ingrédients. Son coût au kg est calculé automatiquement puis remonte dans la recette Caponne.
+Aucun prix ni ingrédient de sous-recette n'est inventé : les sous-recettes restent « À chiffrer » jusqu'à saisie/liaison des vrais produits.
+Les données V3 restent stockées localement. OCR/IA/cloud non actifs.
