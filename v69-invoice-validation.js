@@ -1,83 +1,124 @@
-/* FOOD COST V6.9 — finalisation Factures V1
-   Validation manuelle assistée, contrôle quantité × PU = total,
-   aucune écriture avant validation finale. */
-(function(){
-"use strict";
-const euro=n=>Number.isFinite(+n)?(+n).toFixed(2).replace(".",",")+" €":"—";
-const close=(a,b)=>Math.abs(a-b)<=Math.max(.02,Math.abs(b)*.01);
+/* FOOD COST V6.9 — FACTURES V1
+   L'OCR reste une proposition. La validation humaine est obligatoire.
+   Ajoute un total HT de ligne et bloque toute validation incohérente.
+*/
+(function () {
+  "use strict";
 
-function enhanceInvoiceDialog(){
-  const dlg=document.getElementById("invoiceDialog");
-  const rows=document.getElementById("invoiceRows");
-  if(!dlg||!rows)return;
+  const rows = document.getElementById("invoiceRows");
+  const form = document.getElementById("invoiceForm");
+  const dialog = document.getElementById("invoiceDialog");
+  if (!rows || !form) return;
 
-  function refresh(){
-    const cards=[...rows.children];
-    cards.forEach(card=>{
-      const inputs=[...card.querySelectorAll("input")];
-      if(!inputs.length)return;
+  const n = v => {
+    const x = Number(String(v ?? "").trim().replace(",", "."));
+    return Number.isFinite(x) ? x : NaN;
+  };
+  const eur = v => Number(v).toLocaleString("fr-FR", {
+    minimumFractionDigits: 2, maximumFractionDigits: 2
+  }) + " €";
+  const coherent = (a,b) => Math.abs(a-b) <= Math.max(0.02, Math.abs(b)*0.005);
 
-      // Detect numeric fields from labels/placeholders/names without changing V6.0 data model.
-      const field=(rx)=>inputs.find(i=>rx.test(
-        ((i.name||"")+" "+(i.id||"")+" "+(i.placeholder||"")+" "+
-        (i.closest("label")?.textContent||"")).toLowerCase()
-      ));
-      const q=field(/quant|qt[eé]?|qty/);
-      const p=field(/prix|pu|unit/);
-      const t=field(/total/);
-      if(!q||!p)return;
+  function enhanceRow(row) {
+    if (!row || !row.classList.contains("invrow")) return;
+    const qty = row.querySelector(".vQty");
+    const price = row.querySelector(".vPrice");
+    if (!qty || !price) return;
 
-      let box=card.querySelector(".v69-check");
-      if(!box){box=document.createElement("div");box.className="v69-check";box.style.cssText="margin-top:8px;padding:8px 10px;border-radius:10px;font-size:13px;font-weight:700";card.appendChild(box)}
+    let total = row.querySelector(".v69Total");
+    if (!total) {
+      const label = document.createElement("label");
+      label.className = "v69-total-label";
+      label.innerHTML = 'Total ligne HT (€)<input class="v69Total" type="number" min="0" step=".01" inputmode="decimal" placeholder="Total HT de la ligne">';
+      const match = row.querySelector(".matchinfo");
+      row.insertBefore(label, match || row.lastChild);
+      total = label.querySelector(".v69Total");
+    }
 
-      const qv=Number(String(q.value).replace(",",".")), pv=Number(String(p.value).replace(",","."));
-      const calc=qv>0&&pv>=0?qv*pv:null;
-      const tv=t?Number(String(t.value).replace(",",".")):null;
+    let status = row.querySelector(".v69Status");
+    if (!status) {
+      status = document.createElement("div");
+      status.className = "v69Status";
+      status.style.cssText = "margin:8px 0;padding:9px 10px;border-radius:10px;font-size:13px;font-weight:700";
+      total.closest("label").insertAdjacentElement("afterend", status);
+    }
 
-      if(calc===null){box.textContent="À compléter : quantité et prix unitaire.";box.style.background="#fff3cd";return}
-      if(t && Number.isFinite(tv) && tv>0){
-        if(close(calc,tv)){box.textContent="✓ Cohérent : "+euro(calc);box.style.background="#dff5e5"}
-        else{box.textContent="⚠ Incohérent : Qté × PU = "+euro(calc)+" mais total saisi = "+euro(tv);box.style.background="#ffdfe1"}
-      }else{
-        box.textContent="Calcul : "+euro(calc)+" — à vérifier avant validation.";box.style.background="#e8f0ff";
+    function refresh() {
+      const q = n(qty.value), p = n(price.value), t = n(total.value);
+      if (!(q > 0) || !(p >= 0)) {
+        status.textContent = "À compléter : quantité et prix unitaire.";
+        status.style.background = "#fff3cd";
+        status.dataset.ok = "0";
+        return;
       }
+      const expected = q * p;
+      if (!(t >= 0)) {
+        status.textContent = "Calcul attendu : " + eur(expected) + " — saisis le total de la facture pour contrôler.";
+        status.style.background = "#e8f0ff";
+        status.dataset.ok = "0";
+        return;
+      }
+      if (coherent(expected, t)) {
+        status.textContent = "✓ Ligne cohérente : " + eur(expected);
+        status.style.background = "#dff5e5";
+        status.dataset.ok = "1";
+      } else {
+        status.textContent = "⚠ Incohérent : Qté × PU = " + eur(expected) + " mais total saisi = " + eur(t);
+        status.style.background = "#ffdfe1";
+        status.dataset.ok = "0";
+      }
+    }
+
+    ["input","change"].forEach(ev => {
+      qty.addEventListener(ev, refresh);
+      price.addEventListener(ev, refresh);
+      total.addEventListener(ev, refresh);
     });
+    refresh();
   }
 
-  rows.addEventListener("input",refresh);
-  new MutationObserver(()=>setTimeout(refresh,0)).observe(rows,{childList:true,subtree:true});
-  dlg.addEventListener("toggle",refresh);
-  setTimeout(refresh,200);
+  function enhanceAll() {
+    [...rows.querySelectorAll(".invrow")].forEach(enhanceRow);
+  }
 
-  // Guard final submit when an explicit total exists and arithmetic is inconsistent.
-  const form=document.getElementById("invoiceForm");
-  if(form && !form.dataset.v69){
-    form.dataset.v69="1";
-    form.addEventListener("submit",function(e){
-      let bad=false;
-      [...rows.children].forEach(card=>{
-        const ins=[...card.querySelectorAll("input")];
-        const get=rx=>ins.find(i=>rx.test((((i.name||"")+" "+(i.id||"")+" "+(i.placeholder||"")+" "+(i.closest("label")?.textContent||"")).toLowerCase())));
-        const q=get(/quant|qt[eé]?|qty/),p=get(/prix|pu|unit/),t=get(/total/);
-        if(q&&p&&t){
-          let qv=Number(String(q.value).replace(",",".")),pv=Number(String(p.value).replace(",",".")),tv=Number(String(t.value).replace(",","."));
-          if(qv>0&&pv>=0&&tv>0&&!close(qv*pv,tv))bad=true;
-        }
-      });
-      if(bad){
-        e.preventDefault();e.stopImmediatePropagation();
-        alert("Une ligne est incohérente : quantité × prix unitaire ne correspond pas au total. Corrige-la avant de valider la facture.");
-      }
-    },true);
+  new MutationObserver(enhanceAll).observe(rows, {childList:true, subtree:true});
+  enhanceAll();
+
+  const add = document.getElementById("addInvoiceRow");
+  if (add) add.addEventListener("click", () => setTimeout(enhanceAll, 0));
+
+  const create = document.getElementById("newInvoiceBtn");
+  if (create) create.addEventListener("click", () => setTimeout(enhanceAll, 50));
+
+  if (dialog) dialog.addEventListener("toggle", enhanceAll);
+
+  // Passe avant le gestionnaire V6.0 : rien n'est enregistré si une ligne n'est pas contrôlée.
+  form.addEventListener("submit", function(e) {
+    enhanceAll();
+    const activeRows = [...rows.querySelectorAll(".invrow")].filter(r => {
+      const name = r.querySelector(".vName")?.value.trim();
+      const price = n(r.querySelector(".vPrice")?.value);
+      return name && price > 0;
+    });
+
+    if (!activeRows.length) return;
+
+    const incomplete = activeRows.some(r => r.querySelector(".v69Status")?.dataset.ok !== "1");
+    if (incomplete) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      alert("Validation bloquée : vérifie chaque ligne. Le total HT doit correspondre à Quantité × Prix unitaire.");
+      return false;
+    }
+  }, true);
+
+  // Petit rappel visible : aucune mise à jour automatique avant validation finale.
+  const title = form.querySelector("h2");
+  if (title && !document.getElementById("v69Notice")) {
+    const p = document.createElement("p");
+    p.id = "v69Notice";
+    p.className = "muted small";
+    p.textContent = "OCR = préremplissage uniquement. Corrige les champs puis contrôle chaque total. Les prix fournisseurs ne changent qu'après « Valider définitivement la facture ».";
+    title.insertAdjacentElement("afterend", p);
   }
-}
-function install(){
-  enhanceInvoiceDialog();
-  const btn=document.getElementById("newInvoiceBtn");
-  if(btn && !btn.dataset.v69){
-    btn.dataset.v69="1";
-    btn.addEventListener("click",()=>setTimeout(enhanceInvoiceDialog,100));
-  }
-}
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install);else install();
 })();

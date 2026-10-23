@@ -1,7 +1,13 @@
-# FOOD COST V6.10 — correctif brouillon facture
-- Sauvegarde automatique de la fiche de validation pendant la saisie.
-- Sauvegarde lorsque FOOD COST passe en arrière-plan.
-- Restauration automatique au retour dans l’application, y compris après un rechargement iOS.
-- Le brouillon n’est pas une facture validée et ne modifie aucun prix fournisseur.
-- « Annuler » efface volontairement le brouillon.
-- Les données FOOD COST existantes sont conservées.
+# FOOD COST V6.9 — Factures V1
+
+Correctif de finalisation du module Factures.
+
+- OCR = proposition uniquement.
+- Fournisseur, date, référence et lignes restent modifiables.
+- Chaque ligne possède un total HT à contrôler.
+- Validation bloquée si quantité × prix unitaire ≠ total HT.
+- Ancien/nouveau prix et variation restent affichés par FOOD COST.
+- Aucun prix fournisseur n'est modifié avant la validation définitive.
+- Les données localStorage existantes sont conservées.
+
+Téléverser les 4 fichiers à la racine de la branche `principal`.
