@@ -1,15 +1,12 @@
-# FOOD COST V6.10.1 — UNITÉS
+# FOOD COST V6.11 — unités des sous-recettes
 
-Correctif ciblé des unités, sans réinitialiser les données.
+Correctif ciblé, sans réinitialisation des données.
 
-- Répare la valeur connue de Sauce gorgonzola : 2000 L -> 2 L.
-- Une quantité saisie en L reste affichée en L.
-- Ajoute cL aux unités de volume.
-- Conversions internes : 1 L = 100 cL = 1000 mL.
-- Conversions internes : 1 kg = 1000 g.
-- Aucune conversion g <-> mL : FOOD COST ne suppose jamais 1 g = 1 mL.
+- Sauce gorgonzola liée à la Caponne : 60 mL reste 60 mL après sauvegarde et réouverture.
+- Crème parmesan-ail liée à la Caponne : l'unité reste en volume (mL) après sauvegarde et réouverture.
+- Rendement Sauce gorgonzola : 2 L reste 2 L.
+- Aucune conversion g ↔ mL n'est faite dans les calculs.
 - Les factures, produits, recettes et historiques existants restent dans localStorage.
+- Migration uniquement des deux lignes déjà identifiées comme sous-recettes de la Caponne.
 
 Téléverser les 4 fichiers à la racine de la branche `principal`.
-
-- Correctif V6.10.1 : le numéro visible de l'application affiche désormais V6.10.1.

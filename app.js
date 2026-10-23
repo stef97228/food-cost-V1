@@ -1,6 +1,6 @@
 const BASE_PRODUCTS=[
 {id:"mozzarella",supplier:"West Indies Trade",name:"Mozzarella Bella Stella 6×2 kg",price:7.85,unit:"kg"},{id:"semola",supplier:"West Indies Trade",name:"Semola Caputo 25 kg",price:2.756,unit:"kg"},{id:"prosciutto",supplier:"West Indies Trade",name:"Prosciutto Nazionale 6 kg",price:22.95,unit:"kg"},{id:"spianata",supplier:"West Indies Trade",name:"Spianata picante entière",price:22.90,unit:"kg"},{id:"bavette",supplier:"VODELYS",name:"Bavette d’aloyau boule",price:18.85,unit:"kg"},{id:"mangue",supplier:"VODELYS",name:"Mangue cubes",price:8.05,unit:"kg"},{id:"os",supplier:"VODELYS",name:"Os gouttière",price:9.75,unit:"kg"},{id:"crevette",supplier:"VODELYS",name:"Crevette entière crue sauvage 10/20",price:16.75,unit:"kg"},{id:"moule",supplier:"VODELYS",name:"Moule entière cuite 80/100",price:6.33,unit:"kg"},{id:"stracciatella",supplier:"VODELYS",name:"Stracciatella 100 g",price:25,unit:"kg"},{id:"jambon",supplier:"Boniteau / Bino Viandes",name:"Jambon blanc supérieur DD",price:11.5,unit:"kg"},{id:"filet",supplier:"Pro à Pro",name:"Filet de poulet UE 120/160 g",price:9.176,unit:"kg"}];
-const CAP_DEFAULT={id:"caponne",name:"Escalope de poulet Caponne",salePrice:null,notes:"Cuisse de poulet désossée · 190 g cru",ingredients:[{name:"Cuisse de poulet désossée",qty:190,unit:"g",productId:"",manualPrice:null,status:"confirmé",note:"Prix manquant. Ne pas utiliser le prix du filet."},{name:"Farine",qty:15,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Œuf",qty:25,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Chapelure",qty:30,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Sauce gorgonzola",qty:60,unit:"g",productId:"",subrecipeId:"gorgonzola",manualPrice:null,status:"sous-recette à valider"},{name:"Mozzarella",qty:50,unit:"g",productId:"mozzarella",manualPrice:null,status:"grammage à valider"},{name:"Penne sèches",qty:100,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Crème parmesan-ail",qty:93,unit:"g",productId:"",subrecipeId:"parmesan-garlic",manualPrice:null,status:"sous-recette à valider"},{name:"Copeaux de parmesan",qty:10,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Persil",qty:2,unit:"g",productId:"",manualPrice:null,status:"à valider"}]};
+const CAP_DEFAULT={id:"caponne",name:"Escalope de poulet Caponne",salePrice:null,notes:"Cuisse de poulet désossée · 190 g cru",ingredients:[{name:"Cuisse de poulet désossée",qty:190,unit:"g",productId:"",manualPrice:null,status:"confirmé",note:"Prix manquant. Ne pas utiliser le prix du filet."},{name:"Farine",qty:15,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Œuf",qty:25,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Chapelure",qty:30,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Sauce gorgonzola",qty:60,unit:"ml",productId:"",subrecipeId:"gorgonzola",manualPrice:null,status:"sous-recette à valider"},{name:"Mozzarella",qty:50,unit:"g",productId:"mozzarella",manualPrice:null,status:"grammage à valider"},{name:"Penne sèches",qty:100,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Crème parmesan-ail",qty:93,unit:"ml",productId:"",subrecipeId:"parmesan-garlic",manualPrice:null,status:"sous-recette à valider"},{name:"Copeaux de parmesan",qty:10,unit:"g",productId:"",manualPrice:null,status:"à valider"},{name:"Persil",qty:2,unit:"g",productId:"",manualPrice:null,status:"à valider"}]};
 const RK="foodCostRecipesV3",R2="foodCostRecipesV2",RO="foodCostRecipes",SK="foodCostSubrecipesV4",PK="foodCostProductsV5",IK="foodCostInvoicesV5",STK="foodCostInventoryV5",STKH="foodCostInventoryHistoryV52",PLK="foodCostPlatePhotosV56";
 const SUB_DEFAULT=[{id:"gorgonzola",name:"Sauce gorgonzola",yieldG:1000,ingredients:[]},{id:"parmesan-garlic",name:"Crème parmesan-ail",yieldG:1000,ingredients:[]}];
 const clone=x=>JSON.parse(JSON.stringify(x));
@@ -18,7 +18,26 @@ function saveProducts(a){jsonSet(PK,a)}
 function product(id){return loadProducts().find(p=>p.id===id)}
 function migrateIngredient(i){let pid=i.productId||"",sid=i.subrecipeId||"";if(!pid&&i.name==="Mozzarella")pid="mozzarella";if(!sid&&i.name==="Sauce gorgonzola")sid="gorgonzola";if(!sid&&i.name==="Crème parmesan-ail")sid="parmesan-garlic";return{name:i.name||"",qty:Number(i.qty)||0,unit:i.unit||"g",productId:pid,subrecipeId:sid,manualPrice:i.manualPrice??(pid||sid?"":i.price??null),status:i.status||"",note:i.note||""}}
 function initialRecipes(){let prior=jsonGet(R2,[]);if(!Array.isArray(prior)||!prior.length)prior=jsonGet(RO,[]);let cap=clone(CAP_DEFAULT),users=[];for(const r of (Array.isArray(prior)?prior:[])){if(!r?.name)continue;if(r.id==="caponne"||r.name===CAP_DEFAULT.name)cap={...cap,...r,id:"caponne",ingredients:(r.ingredients||cap.ingredients).map(migrateIngredient)};else users.push({...r,id:r.id||"r"+Date.now()+Math.random(),ingredients:(r.ingredients||[]).map(migrateIngredient)})}return[cap,...users]}
-function loadRecipes(){let a=jsonGet(RK,null);if(Array.isArray(a)&&a.length)return a;a=initialRecipes();jsonSet(RK,a);return a}function saveRecipes(a){jsonSet(RK,a)}
+function loadRecipes(){let a=jsonGet(RK,null);
+if(Array.isArray(a)&&a.length){
+  let changed=false;
+  a=a.map(r=>{
+    if(r?.id!=="caponne")return r;
+    let ings=(r.ingredients||[]).map(i=>{
+      if(i?.subrecipeId==="gorgonzola"&&i.unit==="g"){
+        changed=true; return {...i,unit:"ml",qty:Number(i.qty)||60};
+      }
+      if(i?.subrecipeId==="parmesan-garlic"&&i.unit==="g"){
+        changed=true; return {...i,unit:"ml"};
+      }
+      return i;
+    });
+    return {...r,ingredients:ings};
+  });
+  if(changed)jsonSet(RK,a);
+  return a
+}
+a=initialRecipes();jsonSet(RK,a);return a}function saveRecipes(a){jsonSet(RK,a)}
 function loadSubs(){let a=jsonGet(SK,null);if(Array.isArray(a)&&a.length){
 let changed=false;
 a=a.map(s=>{
