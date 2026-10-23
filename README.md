@@ -1,4 +1,4 @@
-# FOOD COST V6.10 — UNITÉS
+# FOOD COST V6.10.1 — UNITÉS
 
 Correctif ciblé des unités, sans réinitialiser les données.
 
@@ -11,3 +11,5 @@ Correctif ciblé des unités, sans réinitialiser les données.
 - Les factures, produits, recettes et historiques existants restent dans localStorage.
 
 Téléverser les 4 fichiers à la racine de la branche `principal`.
+
+- Correctif V6.10.1 : le numéro visible de l'application affiche désormais V6.10.1.
