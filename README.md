@@ -1,9 +1,7 @@
-# FOOD COST V6.9 — Factures V1
-Cette version finalise le chemin gratuit de validation des factures :
-- OCR local = proposition seulement ;
-- fiche de validation reste entièrement modifiable ;
-- contrôle visuel quantité × prix unitaire ;
-- blocage de validation si un total explicite est incohérent ;
-- aucune modification automatique de prix avant validation finale ;
-- données localStorage conservées.
-Téléverser les 4 fichiers sans supprimer les autres fichiers du dépôt.
+# FOOD COST V6.10 — correctif brouillon facture
+- Sauvegarde automatique de la fiche de validation pendant la saisie.
+- Sauvegarde lorsque FOOD COST passe en arrière-plan.
+- Restauration automatique au retour dans l’application, y compris après un rechargement iOS.
+- Le brouillon n’est pas une facture validée et ne modifie aucun prix fournisseur.
+- « Annuler » efface volontairement le brouillon.
+- Les données FOOD COST existantes sont conservées.
