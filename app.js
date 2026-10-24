@@ -151,7 +151,26 @@ function renderPlateRecipeOptions(){
   plateStatus.textContent=rs.length?`${rs.length} recette(s) disponible(s). Choisis une recette existante ou crée-en une nouvelle.`:"Aucune recette existante détectée. Tu peux créer une nouvelle recette.";
 }
 function loadPlateRecipe(){let id=plateRecipeSelect.value;plateRows.innerHTML="";if(id==="new"){plateRecipeName.value="";plateRows.appendChild(plateIngredientRow());}else{let r=loadRecipes().find(x=>x.id===id);plateRecipeName.value=r?.name||"";(r?.ingredients?.length?r.ingredients:[{}]).forEach(i=>plateRows.appendChild(plateIngredientRow(i)))}plateLive()}
-function selectPlateFile(file){if(!file)return;pendingPlatePhoto="";platePreview.innerHTML="";let rd=new FileReader();rd.onload=()=>{pendingPlatePhoto=rd.result;platePreview.innerHTML=`<img class="plate-photo" src="${rd.result}" alt="Photo du plat">`;plateBuilder.classList.remove("hidden");renderPlateRecipeOptions();loadPlateRecipe();plateStatus.textContent="Photo prête. L’IA n’est pas connectée : corrige ou saisis les composants avant d’enregistrer."};rd.readAsDataURL(file)}
+async function analyzePlateWithAI(){
+  if(!pendingPlatePhoto)return;
+  plateStatus.textContent="Analyse IA du plat en cours…";
+  try{
+    const r=await fetch("/api/food-cost-ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"analyze_plate",image:pendingPlatePhoto})});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(d.error||"IA indisponible");
+    const a=d.analysis||{};
+    if(a.recipe_name&&!plateRecipeName.value.trim())plateRecipeName.value=a.recipe_name;
+    if(Array.isArray(a.ingredients)&&a.ingredients.length){
+      plateRows.innerHTML="";
+      a.ingredients.forEach(i=>plateRows.appendChild(plateIngredientRow({name:i.name||"",qty:Number(i.qty)||0,unit:i.unit||"g"})));
+      plateLive();
+      plateStatus.textContent="Proposition IA chargée. Vérifie/corrige impérativement les composants et grammages avant d’enregistrer.";
+    }else plateStatus.textContent="L’IA n’a pas proposé de composants. Saisis-les manuellement.";
+  }catch(e){
+    plateStatus.textContent="IA indisponible pour le moment. Mode manuel actif : tu peux continuer sans perdre la photo.";
+  }
+}
+function selectPlateFile(file){if(!file)return;pendingPlatePhoto="";platePreview.innerHTML="";let rd=new FileReader();rd.onload=()=>{pendingPlatePhoto=rd.result;platePreview.innerHTML=`<img class="plate-photo" src="${rd.result}" alt="Photo du plat">`;plateBuilder.classList.remove("hidden");renderPlateRecipeOptions();loadPlateRecipe();plateStatus.textContent="Photo prête. Tentative d’analyse IA…";analyzePlateWithAI()};rd.readAsDataURL(file)}
 plateInput.onchange=()=>selectPlateFile(plateInput.files?.[0]);plateGallery.onchange=()=>selectPlateFile(plateGallery.files?.[0]);plateRecipeSelect.onchange=loadPlateRecipe;addPlateRow.onclick=()=>{plateRows.appendChild(plateIngredientRow());plateLive()};
 savePlateBtn.onclick=()=>{let name=plateRecipeName.value.trim(),ings=readPlateRows();if(!name){alert("Indique le nom de la recette.");return}if(!ings.length){alert("Ajoute au moins un composant.");return}if(!confirm("Enregistrer cette fiche et ses composants dans la recette ?\n\nLa photo est facultative et les grammages restent sous ta validation."))return;let rs=loadRecipes(),id=plateRecipeSelect.value;if(id==="new"){id="r"+Date.now();rs.push({id,name,salePrice:null,notes:"Créée depuis le scan du plat — grammages à valider",ingredients:ings})}else{let n=rs.findIndex(r=>r.id===id);if(n<0)return;rs[n]={...rs[n],name,ingredients:ings}}saveRecipes(rs);let photos=jsonGet(PLK,{});if(pendingPlatePhoto)photos[id]={dataUrl:pendingPlatePhoto,date:new Date().toISOString()};try{jsonSet(PLK,photos)}catch(e){plateStatus.textContent="Recette enregistrée, mais la photo est trop lourde pour le stockage local. La fiche recette est conservée."}renderAll();plateStatus.textContent="Recette enregistrée. Tu peux maintenant l’ouvrir dans Recettes pour compléter les prix et le prix de vente.";};
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
@@ -161,7 +180,7 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
   if(b.dataset.tab==="scan"){renderPlateRecipeOptions();loadPlateRecipe();}
 });
 const BACKUP_KEYS=[RK,R2,RO,SK,PK,IK,STK,STKH,PLK];
-function exportBackup(){let data={app:"FOOD COST",version:"V7.0",exportedAt:new Date().toISOString(),storage:{}};BACKUP_KEYS.forEach(k=>{let v=localStorage.getItem(k);if(v!==null)data.storage[k]=v});let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`FOOD-COST-sauvegarde-${today()}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function exportBackup(){let data={app:"FOOD COST",version:"V7.2",exportedAt:new Date().toISOString(),storage:{}};BACKUP_KEYS.forEach(k=>{let v=localStorage.getItem(k);if(v!==null)data.storage[k]=v});let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`FOOD-COST-sauvegarde-${today()}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 async function importBackup(file){if(!file)return;try{let data=JSON.parse(await file.text());if(!data||data.app!=="FOOD COST"||!data.storage)throw new Error("format");if(!confirm("Restaurer cette sauvegarde FOOD COST ?\n\nLes données locales actuelles seront remplacées par celles du fichier."))return;BACKUP_KEYS.forEach(k=>localStorage.removeItem(k));Object.entries(data.storage).forEach(([k,v])=>{if(BACKUP_KEYS.includes(k))localStorage.setItem(k,String(v))});renderPlateRecipeOptions();loadPlateRecipe();renderAll();alert("Sauvegarde restaurée.")}catch(e){alert("Ce fichier n’est pas une sauvegarde FOOD COST valide.")}finally{importDataInput.value=""}}
 if(exportDataBtn)exportDataBtn.onclick=exportBackup;if(importDataInput)importDataInput.onchange=()=>importBackup(importDataInput.files?.[0]);
 function renderAll(){renderRecipes();renderProducts();renderSubs();renderInvoices();renderInventory()}
@@ -174,5 +193,5 @@ renderAll();
 if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{});
 
 // V7 — connexion IA prête côté interface, sans secret client.
-async function refreshAiStatus(){const el=document.getElementById("aiStatus");if(!el)return;try{const r=await fetch("./api/food-cost-ai/status",{cache:"no-store"});if(!r.ok)throw new Error("offline");const d=await r.json();el.textContent=d?.ready?"IA sécurisée prête.":"Mode local actif — serveur IA non configuré.";}catch{el.textContent="Mode local actif — aucune clé API n’est stockée dans l’application.";}}
+async function refreshAiStatus(){const el=document.getElementById("aiStatus");if(!el)return;try{const r=await fetch("/api/food-cost-ai/status",{cache:"no-store"});if(!r.ok)throw new Error("offline");const d=await r.json();el.textContent=d?.ready?"IA sécurisée prête.":"Mode local actif — serveur IA non configuré.";}catch{el.textContent="Mode local actif — aucune clé API n’est stockée dans l’application.";}}
 refreshAiStatus();

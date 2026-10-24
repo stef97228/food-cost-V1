@@ -1,23 +1,37 @@
-# FOOD COST V7.1 — VERSION CONSOLIDÉE
+# FOOD COST V7.2 — OpenAI prêt pour Vercel
 
-Une seule base, sans empilement des anciens fichiers de correctifs.
+Cette version reprend V7.1 et ajoute la connexion IA côté serveur.
 
-Inclus : recettes, sous-recettes, unités g/kg/mL/cL/L/pièce, correctif 60 mL, rendement 2 L, fournisseurs, factures avec validation humaine et contrôle quantité × prix = total, inventaire, scan plat local, sauvegarde/restauration et préparation de la connexion IA sécurisée.
+## Sécurité
+La clé OpenAI n'est jamais dans `app.js`, GitHub ou le navigateur.
+Vercel doit recevoir une variable secrète nommée `OPENAI_API_KEY`.
 
-## OpenAI
-Aucune clé API n'est incluse dans l'application publique. La V7 est préparée pour un endpoint serveur sécurisé `/api/food-cost-ai`. La configuration de l'hébergement et du secret OpenAI se fera demain. Sans serveur IA, FOOD COST continue de fonctionner en mode local.
+## API incluse
+- `/api/food-cost-ai/status` : vérifie si le secret est configuré.
+- `/api/food-cost-ai` : analyse une photo de plat et propose composants + grammages estimés.
+- Les grammages restent toujours à valider manuellement.
+- Aucun prix fournisseur n'est inventé.
 
-## Installation
-Téléverser à la racine de `principal` les 4 fichiers :
+## À téléverser sur la branche déployée par Vercel
+Fichiers racine :
 - app.js
 - index.html
+- styles.css
 - sw.js
 - README.md
+- vercel.json
 
-Les anciens fichiers `v61-fix.js`, `v63-invoice.js`, etc. peuvent rester dans GitHub pour l'instant : V7.1 ne les charge plus.
+Dossier :
+- api/
+  - food-cost-ai.js
+  - food-cost-ai/status.js
 
-Les données existantes restent dans le localStorage de l'iPhone.
+## Vercel
+Créer une variable de type Secret :
+`OPENAI_API_KEY` = la clé API OpenAI.
+Puis redéployer.
 
+Optionnel :
+`OPENAI_MODEL` permet de changer le modèle sans modifier le code.
 
-## V7.1 — Design
-Interface plus moderne et colorée : cartes, navigation, boutons, indicateurs, formulaires et affichage mobile améliorés. Aucune donnée métier n'est modifiée.
+V7.2 fonctionne toujours en mode manuel si l'IA est indisponible.
