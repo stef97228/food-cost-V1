@@ -1,5 +1,6 @@
 {
   "name": "food-cost",
-  "version": "1.0.0",
-  "private": true
+  "version": "7.2.1",
+  "private": true,
+  "type": "module"
 }
