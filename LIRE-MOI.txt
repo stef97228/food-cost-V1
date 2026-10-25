@@ -1,0 +1,15 @@
+FOOD COST V7.4 — FINITION
+
+À envoyer à la racine du dépôt GitHub (branche main) :
+- v74-finition.js
+- sw.js (remplacer l'ancien)
+
+Un seul commit suffit. Vercel redéploiera ensuite automatiquement.
+Après déploiement, recharge FOOD COST deux fois si V7.4 n'apparaît pas immédiatement (mise à jour du service worker).
+
+3 tests seulement :
+1. Scan plat : choisir une photo -> proposition IA ou message d'erreur précis.
+2. Fournisseurs : groupes par fournisseur, articles triés alphabétiquement.
+3. Inventaire : fournisseurs harmonisés et données conservées.
+
+Aucune clé API n'est incluse dans ces fichiers. Les données locales et les clés localStorage existantes ne sont pas modifiées.
