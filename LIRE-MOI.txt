@@ -1,11 +1,25 @@
-FOOD COST V7.5 — PRODUCTION MOBILE
+FOOD COST V7.5.1 — REMISE AU PROPRE
 
-À la racine GitHub, envoyer/remplacer ENSEMBLE :
-- v75-production.js (nouveau)
-- sw.js (remplace l’ancien)
+But :
+- index.html réécrit proprement ;
+- ancien v75-production.js NON chargé ;
+- un seul traitement du scan photo ;
+- aperçu photo strictement contenu sur iPhone ;
+- image allégée avant envoi à l'IA ;
+- service worker simplifié : plus d'injection de scripts ;
+- mêmes clés localStorage : recettes, produits, factures et inventaires ne sont pas renommés.
 
-Un seul commit. Ne touche pas à app.js, aux recettes, aux factures ni à l’API.
+À téléverser ensemble à la RACINE de GitHub :
+1. index.html
+2. styles.css
+3. v751-mobile.js
+4. sw.js
 
-Cette version force le correctif directement sur l’image au moment où elle est créée : max 240 px de haut et jamais plus large que sa carte. Elle ne dépend donc plus de l’ancien CSS pour empêcher la photo d’élargir l’écran.
+Ne supprime pas app.js ni le dossier api.
+Le fichier v75-production.js peut rester dans GitHub : V7.5.1 ne le charge plus.
 
-Le service worker injecte automatiquement V7.5 dans la page et retire l’ancien correctif V7.4 lors de la navigation. Après le déploiement, fermer complètement l’onglet FOOD COST puis le rouvrir. Si le badge reste V7.4 au premier affichage, recharger une fois : le nouveau service worker prend alors le contrôle.
+Après le commit et le déploiement Vercel :
+- fermer complètement l'onglet FOOD COST ;
+- rouvrir l'application ;
+- vérifier que le badge affiche V7.5.1 ;
+- faire UNE photo test.
