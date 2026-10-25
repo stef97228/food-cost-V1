@@ -1,0 +1,4 @@
+/* FOOD COST V7.4.1 — photo Scan plat adaptée iPhone */
+#platePreview{margin:12px 0;display:flex;justify-content:center;align-items:center;overflow:hidden;border-radius:14px;background:rgba(0,0,0,.035)}
+#platePreview img,#platePreview .plate-photo{display:block;width:100%!important;max-width:100%!important;height:auto!important;max-height:280px!important;object-fit:contain!important;border-radius:14px}
+@media (max-width:600px){#platePreview img,#platePreview .plate-photo{max-height:240px!important}}

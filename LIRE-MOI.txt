@@ -1,15 +1,11 @@
-FOOD COST V7.4 — FINITION
+FOOD COST V7.4.1 — CORRECTIF PHOTO IPHONE
 
-À envoyer à la racine du dépôt GitHub (branche main) :
-- v74-finition.js
-- sw.js (remplacer l'ancien)
+À ajouter à la racine du dépôt GitHub :
+- v741-photo.css
+- v741-photo.js
 
-Un seul commit suffit. Vercel redéploiera ensuite automatiquement.
-Après déploiement, recharge FOOD COST deux fois si V7.4 n'apparaît pas immédiatement (mise à jour du service worker).
+Puis ajouter dans index.html :
+1) juste avant </head> : <link rel="stylesheet" href="./v741-photo.css?v=741">
+2) juste avant </body> : <script src="./v741-photo.js?v=741"></script>
 
-3 tests seulement :
-1. Scan plat : choisir une photo -> proposition IA ou message d'erreur précis.
-2. Fournisseurs : groupes par fournisseur, articles triés alphabétiquement.
-3. Inventaire : fournisseurs harmonisés et données conservées.
-
-Aucune clé API n'est incluse dans ces fichiers. Les données locales et les clés localStorage existantes ne sont pas modifiées.
+Le correctif limite la photo Scan plat à 240 px de haut sur iPhone, conserve ses proportions et laisse les champs IA visibles dessous.
