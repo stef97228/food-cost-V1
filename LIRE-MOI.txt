@@ -1,11 +1,11 @@
-FOOD COST V7.4.1 — CORRECTIF PHOTO IPHONE
+FOOD COST V7.5 — PRODUCTION MOBILE
 
-À ajouter à la racine du dépôt GitHub :
-- v741-photo.css
-- v741-photo.js
+À la racine GitHub, envoyer/remplacer ENSEMBLE :
+- v75-production.js (nouveau)
+- sw.js (remplace l’ancien)
 
-Puis ajouter dans index.html :
-1) juste avant </head> : <link rel="stylesheet" href="./v741-photo.css?v=741">
-2) juste avant </body> : <script src="./v741-photo.js?v=741"></script>
+Un seul commit. Ne touche pas à app.js, aux recettes, aux factures ni à l’API.
 
-Le correctif limite la photo Scan plat à 240 px de haut sur iPhone, conserve ses proportions et laisse les champs IA visibles dessous.
+Cette version force le correctif directement sur l’image au moment où elle est créée : max 240 px de haut et jamais plus large que sa carte. Elle ne dépend donc plus de l’ancien CSS pour empêcher la photo d’élargir l’écran.
+
+Le service worker injecte automatiquement V7.5 dans la page et retire l’ancien correctif V7.4 lors de la navigation. Après le déploiement, fermer complètement l’onglet FOOD COST puis le rouvrir. Si le badge reste V7.4 au premier affichage, recharger une fois : le nouveau service worker prend alors le contrôle.
