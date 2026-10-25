@@ -1,8 +1,10 @@
-# FOOD COST V7.2.3
+# FOOD COST V7.3 — consolidée
 
-Correctif Vercel : le serveur Node est maintenant `server.ts` à la racine afin d'être détecté automatiquement par Vercel.
+- Scan plat raccordé à `/api/food-cost-ai` (photo → proposition IA → validation humaine).
+- Statut IA corrigé sur la même route Vercel.
+- Factures : normalisation des fournisseurs connus à la validation.
+- Inventaire : produits regroupés automatiquement par fournisseur.
+- Aucun prix fournisseur n’est inventé par l’IA.
+- Les données restent en localStorage et sont compatibles avec la sauvegarde/restauration existante.
 
-Test attendu après déploiement :
-`/api/food-cost-ai/status` doit répondre en JSON.
-
-La clé OpenAI reste uniquement dans la variable d'environnement `OPENAI_API_KEY` de Vercel.
+Important : conserver `OPENAI_API_KEY` uniquement dans les variables d’environnement Vercel.
