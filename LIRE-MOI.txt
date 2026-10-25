@@ -1,25 +1,32 @@
-FOOD COST V7.5.1 — REMISE AU PROPRE
+FOOD COST V7.6 — CARTE + ALLERGÈNES
 
-But :
-- index.html réécrit proprement ;
-- ancien v75-production.js NON chargé ;
-- un seul traitement du scan photo ;
-- aperçu photo strictement contenu sur iPhone ;
-- image allégée avant envoi à l'IA ;
-- service worker simplifié : plus d'injection de scripts ;
-- mêmes clés localStorage : recettes, produits, factures et inventaires ne sont pas renommés.
+À envoyer à la racine du dépôt GitHub :
+- index.html
+- styles.css
+- v751-mobile.js
+- v76-menu-allergenes.js
+- sw.js
 
-À téléverser ensemble à la RACINE de GitHub :
-1. index.html
-2. styles.css
-3. v751-mobile.js
-4. sw.js
+NE PAS supprimer :
+- app.js
+- le dossier api/
+- manifest.json / icon.svg
 
-Ne supprime pas app.js ni le dossier api.
-Le fichier v75-production.js peut rester dans GitHub : V7.5.1 ne le charge plus.
+Cette mise à jour :
+- conserve les données existantes du téléphone ;
+- pré-crée les fiches cuisine de la carte Poivre & Sel avec leurs prix de vente ;
+- ne duplique pas le Poulet al Capone / Escalope de poulet Caponne existant ;
+- ajoute un onglet « Carte » par catégories ;
+- ajoute les 14 allergènes à la fiche recette ;
+- marque les allergènes proposés comme « à valider » jusqu'à validation manuelle ;
+- conserve le correctif photo iPhone V7.5.1.
 
-Après le commit et le déploiement Vercel :
-- fermer complètement l'onglet FOOD COST ;
-- rouvrir l'application ;
-- vérifier que le badge affiche V7.5.1 ;
-- faire UNE photo test.
+Après le commit :
+1. Fermer complètement FOOD COST.
+2. Rouvrir.
+3. Vérifier « V7.6 » en haut.
+4. Ouvrir « Carte » et vérifier les catégories.
+5. Ouvrir une fiche recette et vérifier la zone Allergènes.
+
+IMPORTANT : les allergènes préremplis sont uniquement des propositions basées sur les ingrédients
+visibles sur la carte photographiée. Ils doivent être vérifiés avant utilisation opérationnelle.
