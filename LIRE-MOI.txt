@@ -1,10 +1,1 @@
-FOOD COST V8.0 — CONSOLIDATION
-- Base fournisseurs validée conservée.
-- Matching automatique sécurisé conservé.
-- Grammages réels Poulet al Capone consolidés définitivement.
-- Garde-fous cuisse/filet et jambon cru/jambon blanc.
-- Tableau d'avancement automatique.
-- Calculs €/kg, €/L, €/pièce et sous-recettes conservés.
-- Aucun prix ou grammage inconnu inventé.
-- Données locales existantes conservées.
-Installation : remplacer tous les fichiers à la racine GitHub en un seul commit.
+FOOD COST V8.1 — file de travail automatique des recettes. Aucun prix ni grammage inconnu n'est inventé. Remplacer tous les fichiers à la racine GitHub en un seul commit.
