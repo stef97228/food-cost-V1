@@ -1,7 +1,1 @@
-FOOD COST V8.2 — CARTE + LIAISONS FOURNISSEURS
-- prépare les ingrédients connus de la carte sans inventer de grammages
-- prépare les correspondances fournisseurs à haute confiance
-- bouton unique pour valider explicitement toutes les liaisons sûres
-- mozzarella, parmesan générique, poulet générique, champignons et poulpe restent ambigus
-- conserve les données et validations existantes
-Installation : remplacer les fichiers du dépôt en un seul commit.
+FOOD COST V8.4 — ambiguïtés par recette. Chaque choix ne modifie que la recette affichée. Aucun cas ambigu n’est validé automatiquement.
