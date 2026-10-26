@@ -22,7 +22,18 @@ function score(a,b){
  return hit/Math.max(1,Math.min(A.size,B.size));
 }
 function candidates(name){
- return get(PK).map(p=>({...p,_score:score(name,p.name)}))
+ const n=norm(name);
+ return get(PK).map(p=>{
+   let sc=score(name,p.name), pn=norm(p.name), ps=norm(p.supplier);
+   // Métier: une découpe précise ne doit jamais être remplacée par une autre.
+   if(n.includes("cuisse") && pn.includes("cuisse")) sc+=1.2;
+   if(n.includes("cuisse") && pn.includes("filet")) sc-=2;
+   if(n.includes("filet") && pn.includes("filet")) sc+=1.2;
+   if(n.includes("filet") && pn.includes("cuisse")) sc-=2;
+   // Correspondances déjà connues/validées pour le Poulet al Capone.
+   if(n.includes("cuisse") && pn.includes("cuisse") && pn.includes("poulet") && ps.includes("martinique")) sc+=1.5;
+   return {...p,_score:sc};
+  })
   .filter(p=>p._score>=.45).sort((a,b)=>b._score-a._score).slice(0,4);
 }
 function money(n){return Number(n||0).toLocaleString("fr-FR",{style:"currency",currency:"EUR"})}
@@ -51,7 +62,7 @@ if(!form)return;
 const actions=form.querySelector(".actions");
 if(document.getElementById("autoLinkBox"))return;
 const box=document.createElement("div");box.id="autoLinkBox";box.className="auto-link-box";
-box.innerHTML=`<div class="auto-link-head"><b>🔗 Prix fournisseurs · V7.7.1</b><button type="button" id="autoSuggestBtn">Proposer</button></div>
+box.innerHTML=`<div class="auto-link-head"><b>🔗 Prix fournisseurs · V7.7.2</b><button type="button" id="autoSuggestBtn">Proposer</button></div>
 <p class="muted small">FOOD COST rapproche les ingrédients des produits validés des factures. Rien n'est lié sans ta validation.</p>
 <div id="autoLinkRows"></div>
 <div class="auto-link-actions"><button type="button" id="autoApplyBtn">Valider les liaisons</button><button type="button" id="autoClearBtn">Effacer propositions</button></div>`;
@@ -68,13 +79,16 @@ function render(){
  host.innerHTML=(r.ingredients||[]).map((i,idx)=>{
    if(i.subrecipeId)return `<div class="auto-link-row"><b>${i.name}</b><div class="auto-link-ok">Sous-recette liée</div></div>`;
    const products=get(PK),linked=products.find(p=>p.id===i.productId),c=candidates(i.name);
+   const iname=norm(i.name);
+   const safeC=(iname.includes("cuisse") ? c.filter(p=>norm(p.name).includes("cuisse")) :
+                iname.includes("filet") ? c.filter(p=>norm(p.name).includes("filet")) : c);
    if(linked){
     const cost=unitCost(i,linked);
     return `<div class="auto-link-row"><b>${i.name}</b><div class="auto-link-ok">✓ ${linked.name} · ${money(linked.price)}/${linked.unit}${cost!=null?" · "+money(cost):""}</div></div>`;
    }
-   if(!c.length)return `<div class="auto-link-row"><b>${i.name}</b><div class="auto-link-warn">Aucun produit sûr trouvé</div></div>`;
-   proposed[idx]=c[0].id;
-   return `<div class="auto-link-row"><b>${i.name}</b><select data-i="${idx}"><option value="">Ne pas lier</option>${c.map((p,j)=>`<option value="${p.id}" ${j===0?"selected":""}>${p.name} — ${money(p.price)}/${p.unit}</option>`).join("")}</select></div>`;
+   if(!safeC.length)return `<div class="auto-link-row"><b>${i.name}</b><div class="auto-link-warn">Aucun produit sûr trouvé</div></div>`;
+   proposed[idx]=safeC[0].id;
+   return `<div class="auto-link-row"><b>${i.name}</b><select data-i="${idx}"><option value="">Ne pas lier</option>${safeC.map((p,j)=>`<option value="${p.id}" ${j===0?"selected":""}>${p.name} — ${money(p.price)}/${p.unit}</option>`).join("")}</select></div>`;
  }).join("");
  host.querySelectorAll("select").forEach(s=>s.onchange=()=>proposed[Number(s.dataset.i)]=s.value);
 }
