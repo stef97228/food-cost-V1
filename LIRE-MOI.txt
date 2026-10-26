@@ -1,15 +1,10 @@
-FOOD COST V7.9 — VALIDATION RAPIDE DES LIAISONS
-
-Objectif : arrêter le travail ingrédient par ingrédient.
-
-- À l'ouverture d'une recette, FOOD COST prépare les correspondances sûres.
-- Un résumé indique combien de produits sont déjà liés et combien de propositions
-  sont prêtes à valider.
-- « Valider les liaisons » applique toutes les propositions sélectionnées en une fois.
-- Les menus produits visibles dans la fiche sont synchronisés immédiatement.
-- Le calcul coût matière / coefficient / ratio est relancé après validation.
-- Les ingrédients sans prix sûr restent non liés.
-- Les sous-recettes restent séparées.
-- Aucun prix fournisseur n'est inventé ou remplacé silencieusement.
-
-Installation : tous les fichiers à la racine GitHub, remplacer, un seul commit.
+FOOD COST V8.0 — CONSOLIDATION
+- Base fournisseurs validée conservée.
+- Matching automatique sécurisé conservé.
+- Grammages réels Poulet al Capone consolidés définitivement.
+- Garde-fous cuisse/filet et jambon cru/jambon blanc.
+- Tableau d'avancement automatique.
+- Calculs €/kg, €/L, €/pièce et sous-recettes conservés.
+- Aucun prix ou grammage inconnu inventé.
+- Données locales existantes conservées.
+Installation : remplacer tous les fichiers à la racine GitHub en un seul commit.
