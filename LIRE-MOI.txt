@@ -1,20 +1,4 @@
-FOOD COST V7.7 — LIAISONS AUTOMATIQUES
-
-MISE À JOUR COMPLÈTE AU-DESSUS DE V7.6.1
-
-Nouveautés :
-- rapprochement automatique ingrédients ↔ produits fournisseurs validés ;
-- propositions à valider, jamais de remplacement silencieux ;
-- liaison mémorisée après validation ;
-- calculs existants coût matière / coefficient / ratio utilisent ensuite le prix lié ;
-- grammages confirmés du Poulet al Capone intégrés ;
-- conservation Carte, Allergènes et suivi des fiches techniques.
-
-INSTALLATION IPHONE / GITHUB
-Téléverser TOUS les fichiers de ce ZIP à la racine du dépôt GitHub et remplacer
-les fichiers de même nom. Faire un seul commit.
-
-IMPORTANT
-Ne pas supprimer app.js, manifest.json, icon.svg ni le dossier api déjà présents
-dans le dépôt. Ce ZIP est une mise à jour des fichiers concernés, pas un dépôt neuf.
-Les données locales existantes sont conservées.
+FOOD COST V7.7.1 — CORRECTIF LIAISONS
+Le bloc Prix fournisseurs est maintenant inséré de façon robuste dans la fiche recette.
+Aucune donnée locale n'est supprimée. Téléverser tous les fichiers à la racine GitHub,
+remplacer les fichiers existants et faire un seul commit.
