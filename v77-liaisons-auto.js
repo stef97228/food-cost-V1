@@ -62,7 +62,7 @@ if(!form)return;
 const actions=form.querySelector(".actions");
 if(document.getElementById("autoLinkBox"))return;
 const box=document.createElement("div");box.id="autoLinkBox";box.className="auto-link-box";
-box.innerHTML=`<div class="auto-link-head"><b>🔗 Prix fournisseurs · V7.7.2</b><button type="button" id="autoSuggestBtn">Proposer</button></div>
+box.innerHTML=`<div class="auto-link-head"><b>🔗 Prix fournisseurs · V7.8</b><button type="button" id="autoSuggestBtn">Proposer</button></div>
 <p class="muted small">FOOD COST rapproche les ingrédients des produits validés des factures. Rien n'est lié sans ta validation.</p>
 <div id="autoLinkRows"></div>
 <div class="auto-link-actions"><button type="button" id="autoApplyBtn">Valider les liaisons</button><button type="button" id="autoClearBtn">Effacer propositions</button></div>`;

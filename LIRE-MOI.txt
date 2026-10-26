@@ -1,12 +1,16 @@
-FOOD COST V7.7.2 — SÉCURITÉ DES CORRESPONDANCES FOURNISSEURS
+FOOD COST V7.8 — BASE FOURNISSEURS VALIDÉE + MATCHING
 
-Correctif :
-- Cuisse de poulet ne peut plus proposer un filet de poulet.
-- Filet de poulet ne peut plus proposer une cuisse.
-- Pour Poulet al Capone, une cuisse de poulet A&M Martinique est prioritaire si elle
-  existe déjà dans les produits validés de l'application.
-- Si aucune découpe compatible n'existe dans les produits locaux, FOOD COST affiche
-  « Aucun produit sûr trouvé » au lieu de forcer une mauvaise liaison.
-- Toujours aucune liaison enregistrée sans validation humaine.
+Cette version injecte dans la base locale les prix normalisés que nous avons déjà
+validés à partir des factures lisibles. Elle ne contient PAS les lignes dont le
+conditionnement/prix normalisé restait incertain.
 
-Installation : tous les fichiers à la racine GitHub, remplacer, un seul commit.
+Sécurité :
+- ne remplace jamais silencieusement un prix local plus récent ;
+- les nouveaux produits sont marqués seedValidated ;
+- les liaisons recette ↔ produit restent à valider par l'utilisateur ;
+- aucun prix incertain n'est inventé.
+
+Résultat attendu pour Poulet al Capone :
+Cuisse de poulet désossée -> A&M Martinique, Cuisse poulet SOSP 2KG, 5,15 €/kg.
+
+Installation : téléverser tous les fichiers à la racine GitHub, remplacer, un seul commit.
