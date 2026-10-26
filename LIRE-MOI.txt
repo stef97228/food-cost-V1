@@ -1,32 +1,11 @@
-FOOD COST V7.6 — CARTE + ALLERGÈNES
+FOOD COST V7.6.1 — FICHES TECHNIQUES
 
-À envoyer à la racine du dépôt GitHub :
-- index.html
-- styles.css
-- v751-mobile.js
-- v76-menu-allergenes.js
-- sw.js
+Ajout :
+- statut À compléter / À valider / Validée ;
+- compteur des grammages renseignés ;
+- validation manuelle de la fiche technique ;
+- conservation de la carte et des allergènes V7.6.
 
-NE PAS supprimer :
-- app.js
-- le dossier api/
-- manifest.json / icon.svg
-
-Cette mise à jour :
-- conserve les données existantes du téléphone ;
-- pré-crée les fiches cuisine de la carte Poivre & Sel avec leurs prix de vente ;
-- ne duplique pas le Poulet al Capone / Escalope de poulet Caponne existant ;
-- ajoute un onglet « Carte » par catégories ;
-- ajoute les 14 allergènes à la fiche recette ;
-- marque les allergènes proposés comme « à valider » jusqu'à validation manuelle ;
-- conserve le correctif photo iPhone V7.5.1.
-
-Après le commit :
-1. Fermer complètement FOOD COST.
-2. Rouvrir.
-3. Vérifier « V7.6 » en haut.
-4. Ouvrir « Carte » et vérifier les catégories.
-5. Ouvrir une fiche recette et vérifier la zone Allergènes.
-
-IMPORTANT : les allergènes préremplis sont uniquement des propositions basées sur les ingrédients
-visibles sur la carte photographiée. Ils doivent être vérifiés avant utilisation opérationnelle.
+Téléverser tous les fichiers du ZIP à la racine GitHub.
+Ne pas supprimer app.js, le dossier api, manifest.json ou icon.svg.
+Les données déjà présentes sur l'iPhone restent dans le stockage local.
