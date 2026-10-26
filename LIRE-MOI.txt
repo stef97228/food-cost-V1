@@ -1,16 +1,15 @@
-FOOD COST V7.8 — BASE FOURNISSEURS VALIDÉE + MATCHING
+FOOD COST V7.9 — VALIDATION RAPIDE DES LIAISONS
 
-Cette version injecte dans la base locale les prix normalisés que nous avons déjà
-validés à partir des factures lisibles. Elle ne contient PAS les lignes dont le
-conditionnement/prix normalisé restait incertain.
+Objectif : arrêter le travail ingrédient par ingrédient.
 
-Sécurité :
-- ne remplace jamais silencieusement un prix local plus récent ;
-- les nouveaux produits sont marqués seedValidated ;
-- les liaisons recette ↔ produit restent à valider par l'utilisateur ;
-- aucun prix incertain n'est inventé.
+- À l'ouverture d'une recette, FOOD COST prépare les correspondances sûres.
+- Un résumé indique combien de produits sont déjà liés et combien de propositions
+  sont prêtes à valider.
+- « Valider les liaisons » applique toutes les propositions sélectionnées en une fois.
+- Les menus produits visibles dans la fiche sont synchronisés immédiatement.
+- Le calcul coût matière / coefficient / ratio est relancé après validation.
+- Les ingrédients sans prix sûr restent non liés.
+- Les sous-recettes restent séparées.
+- Aucun prix fournisseur n'est inventé ou remplacé silencieusement.
 
-Résultat attendu pour Poulet al Capone :
-Cuisse de poulet désossée -> A&M Martinique, Cuisse poulet SOSP 2KG, 5,15 €/kg.
-
-Installation : téléverser tous les fichiers à la racine GitHub, remplacer, un seul commit.
+Installation : tous les fichiers à la racine GitHub, remplacer, un seul commit.

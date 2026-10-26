@@ -12,7 +12,9 @@ const aliases=[
  ["creme","creme uht"],["chapelure","chapelure"],["moule","moule"],
  ["crevette","crevette gambas"],["stracciatella","stracciatella"],["mangue","mangue"],
  ["bavette","bavette aloyau"],["spianata","spianata"],["champignon","champignon"],
- ["saumon","saumon"],["thon","thon longe"],["chatrou","chatrou poulpe polpo"]
+ ["saumon","saumon"],["thon","thon longe"],["chatrou","chatrou poulpe polpo"],["penne","penne pasta pates"],["creme","creme uht grand fermage"],
+ ["jambon cru","prosciutto nazionale jambon italien"],["persil","persil plat"],
+ ["burrata","burrata"],["grana","grana padano parmesan"],["parmesan","parmigiano reggiano grana padano"]
 ];
 function expanded(s){let n=norm(s);for(const [a,b] of aliases)if(n.includes(a))n+=" "+b;return n}
 function score(a,b){
@@ -62,7 +64,7 @@ if(!form)return;
 const actions=form.querySelector(".actions");
 if(document.getElementById("autoLinkBox"))return;
 const box=document.createElement("div");box.id="autoLinkBox";box.className="auto-link-box";
-box.innerHTML=`<div class="auto-link-head"><b>🔗 Prix fournisseurs · V7.8</b><button type="button" id="autoSuggestBtn">Proposer</button></div>
+box.innerHTML=`<div class="auto-link-head"><b>🔗 Prix fournisseurs · V7.9</b><button type="button" id="autoSuggestBtn">Proposer</button></div>
 <p class="muted small">FOOD COST rapproche les ingrédients des produits validés des factures. Rien n'est lié sans ta validation.</p>
 <div id="autoLinkRows"></div>
 <div class="auto-link-actions"><button type="button" id="autoApplyBtn">Valider les liaisons</button><button type="button" id="autoClearBtn">Effacer propositions</button></div>`;
@@ -91,22 +93,45 @@ function render(){
    return `<div class="auto-link-row"><b>${i.name}</b><select data-i="${idx}"><option value="">Ne pas lier</option>${safeC.map((p,j)=>`<option value="${p.id}" ${j===0?"selected":""}>${p.name} — ${money(p.price)}/${p.unit}</option>`).join("")}</select></div>`;
  }).join("");
  host.querySelectorAll("select").forEach(s=>s.onchange=()=>proposed[Number(s.dataset.i)]=s.value);
+ const total=(r.ingredients||[]).filter(i=>!i.subrecipeId).length;
+ const linked=(r.ingredients||[]).filter(i=>!i.subrecipeId&&i.productId).length;
+ const suggestions=Object.values(proposed).filter(Boolean).length;
+ const summary=document.createElement("div");
+ summary.className="muted small";
+ summary.style.marginTop="10px";
+ summary.textContent=`${linked}/${total} déjà liés · ${suggestions} proposition${suggestions>1?"s":""} prête${suggestions>1?"s":""} à valider`;
+ host.appendChild(summary);
 }
 document.getElementById("autoSuggestBtn").onclick=render;
 document.getElementById("autoClearBtn").onclick=()=>{proposed={};document.getElementById("autoLinkRows").innerHTML=""};
 document.getElementById("autoApplyBtn").onclick=()=>{
  const id=document.getElementById("editId")?.value,a=get(RK),ri=a.findIndex(r=>r.id===id);if(ri<0)return;
- Object.entries(proposed).forEach(([idx,pid])=>{if(pid)a[ri].ingredients[Number(idx)].productId=pid});
+ let applied=0;
+ Object.entries(proposed).forEach(([idx,pid])=>{
+   if(pid && a[ri].ingredients?.[Number(idx)]){
+     a[ri].ingredients[Number(idx)].productId=pid;
+     a[ri].ingredients[Number(idx)].manualPrice=null;
+     applied++;
+   }
+ });
  put(RK,a);
- // Keep visible ingredient dropdowns in sync so the normal Save also preserves links.
  [...document.querySelectorAll("#ingredientRows .ingrow")].forEach((row,idx)=>{
    const pid=proposed[idx];if(!pid)return;
-   const sel=row.querySelector(".iProduct");if(sel){sel.value=pid;sel.dispatchEvent(new Event("input",{bubbles:true}))}
+   const sel=row.querySelector(".iProduct");
+   if(sel){
+     sel.value=pid;
+     sel.dispatchEvent(new Event("input",{bubbles:true}));
+     sel.dispatchEvent(new Event("change",{bubbles:true}));
+   }
  });
+ if(typeof live==="function") try{live()}catch(e){}
+ const btn=document.getElementById("autoApplyBtn");
+ const oldText=btn.textContent;btn.textContent=applied?`✓ ${applied} liaison${applied>1?"s":""} validée${applied>1?"s":""}`:"Aucune liaison à valider";
+ setTimeout(()=>btn.textContent=oldText,1800);
  render();
 };
 const dialog=document.getElementById("editDialog");
-new MutationObserver(()=>{if(dialog.open)setTimeout(render,60)}).observe(dialog,{attributes:true,attributeFilter:["open"]});
+new MutationObserver(()=>{if(dialog.open)setTimeout(render,80)}).observe(dialog,{attributes:true,attributeFilter:["open"]});
 
 // One-time confirmed real data: Poulet al Capone quantities + confirmed A&M chicken product.
 // Only updates the Caponne recipe; it never overwrites a user-validated product link.
