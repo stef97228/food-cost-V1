@@ -1,1 +1,1 @@
-FOOD COST V8.4 — ambiguïtés par recette. Chaque choix ne modifie que la recette affichée. Aucun cas ambigu n’est validé automatiquement.
+Remplacer index.html à la racine. Cette correction force le chargement de v84-ambigu-par-recette.js?v=860 et affiche V8.6 directement. Aucune donnée locale n'est supprimée.
