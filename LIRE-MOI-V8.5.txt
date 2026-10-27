@@ -1,0 +1,22 @@
+FOOD COST V8.5 — mise à jour consolidée
+
+À envoyer dans la RACINE du dépôt GitHub food-cost-V1 en remplaçant le fichier existant :
+- v84-ambigu-par-recette.js
+- assiette-cost-icon.png (nouveau fichier)
+
+Aucun localStorage n'est supprimé : recettes, fournisseurs, prix, inventaires et validations existantes sont conservés.
+
+Nouveautés :
+- V8.5 affichée automatiquement
+- fiche technique imprimable Cuisine
+- fiche technique imprimable Gestion
+- écran global des grammages manquants
+- saisie g/kg/ml/cl/L/pièce
+- avertissement clair "Estimation IA" dans Scan plat
+- icône iPhone Assiette Cost préparée
+- ambiguïtés V8.4 conservées, validation par recette uniquement
+
+Important :
+- aucun grammage n'est inventé
+- aucune liaison fournisseur ambiguë n'est validée automatiquement
+- l'icône iPhone est ajoutée par la page au chargement ; si l'ancienne icône reste sur un raccourci déjà installé, supprimer le raccourci puis l'ajouter à nouveau depuis Safari.
