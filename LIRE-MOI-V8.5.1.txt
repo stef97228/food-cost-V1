@@ -1,0 +1,11 @@
+FOOD COST V8.5.1 — finition ordre de travail
+
+Remplacer uniquement :
+- v84-ambigu-par-recette.js
+
+Correction :
+- le bloc « ⚖️ Grammages à compléter » apparaît maintenant AVANT
+  « 🟡 Cas ambigus · validation par recette ».
+
+Aucune donnée locale n'est effacée ou modifiée.
+Aucune liaison ambiguë n'est validée automatiquement.
