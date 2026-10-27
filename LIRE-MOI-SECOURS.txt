@@ -1,0 +1,1 @@
+SECOURS : remplace uniquement v84-ambigu-par-recette.js par ce fichier. Ne supprime pas l'application et n'efface pas les données Safari. Cette restauration revient au script V8.5.1 qui fonctionnait avant la rectification V8.6.
