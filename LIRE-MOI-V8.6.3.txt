@@ -1,0 +1,14 @@
+FOOD COST V8.6.3
+À envoyer à la racine GitHub :
+- index.html : remplacer
+- v863-iphone-recettes.js : ajouter
+Le fichier v862-import-factures.js peut rester tel quel (il est inclus dans le ZIP par sécurité).
+
+Modifications :
+- badge V8.6.3 affiché correctement
+- ordre : Scan plat > Recettes > Sous-recettes > Fournisseurs > Factures > Inventaire
+- photo du plat visible dans la liste des recettes et dans la fiche
+- recette sans photo : repère « Photo à ajouter »
+- recette incomplète : badge « À compléter »
+- les photos prises via Scan plat restent liées à la recette existante
+- aucune suppression/modification des factures, produits, grammages ou recettes existants
