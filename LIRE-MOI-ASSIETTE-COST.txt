@@ -1,0 +1,17 @@
+ASSIETTE COST — V8.6.4 FINAL TEST
+
+À envoyer à la racine GitHub :
+1. index.html — remplacer
+2. manifest.json — remplacer
+3. v864-carte-photos.js — ajouter
+
+Résultat :
+- nom visible : ASSIETTE COST
+- nom de l'application installée sur iPhone : Assiette Cost
+- Carte : 58 plats et prix
+- photos Scan plat devant les recettes
+- ordre : Scan > Carte > Recettes > Sous-recettes > Fournisseurs > Factures > Inventaire
+- aucune donnée locale supprimée
+
+IMPORTANT iPhone :
+Si l'ancienne icône FOOD COST est déjà sur l'écran d'accueil, après déploiement supprime uniquement cette ancienne icône de l'écran d'accueil puis ajoute de nouveau le site via Safari > Partager > Sur l'écran d'accueil. Cela ne supprime pas les données du site.

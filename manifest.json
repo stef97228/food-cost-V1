@@ -1,6 +1,6 @@
 {
-  "name": "FOOD COST",
-  "short_name": "FOOD COST",
+  "name": "Assiette Cost",
+  "short_name": "Assiette Cost",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f4f6f9",
