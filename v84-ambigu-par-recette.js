@@ -1,4 +1,4 @@
-/* FOOD COST V8.5 — V8.4 ambiguïtés + fiches imprimables + grammages + PWA */
+/* FOOD COST V8.6 — V8.4 ambiguïtés + fiches imprimables + grammages + PWA */
 (()=>{const RK="foodCostRecipesV3",PK="foodCostProductsV5",get=(k,d=[])=>{try{return JSON.parse(localStorage.getItem(k)||"null")??d}catch{return d}},put=(k,v)=>localStorage.setItem(k,JSON.stringify(v)),norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/œ/g,"oe").replace(/[^a-z0-9]+/g," ").trim(),compat=(i,p)=>(p.unit==="kg"&&["g","kg"].includes(i.unit))||(p.unit==="L"&&["ml","cl","L"].includes(i.unit))||(p.unit==="piece"&&i.unit==="piece");
 const fam=n=>{n=norm(n);if(n==="mozzarella")return"mozzarella";if(n==="parmesan")return"parmesan";if(n==="poulet")return"poulet";if(/^champignon/.test(n))return"champignons";if(n==="poulpe"||n==="polpo")return"poulpe";return""},lab={mozzarella:"Mozzarella",parmesan:"Parmesan",poulet:"Poulet",champignons:"Champignons",poulpe:"Poulpe / Polpo"};
 function cand(f,i){return get(PK).filter(p=>compat(i,p)).filter(p=>{let n=norm(p.name);return f==="mozzarella"?n.includes("mozzarella"):f==="parmesan"?/parmigiano|grana padano/.test(n):f==="poulet"?n.includes("poulet"):f==="champignons"?n.includes("champignon"):/chatrou|poulpe/.test(n)})}
@@ -25,19 +25,61 @@ function printRecipe(r,mode){
  let w=open("","_blank"); if(!w)return alert("Autorise les fenêtres pop-up pour imprimer.");
  w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${esc(r.name)}</title><style>@page{size:A4;margin:14mm}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#172033}header{border-bottom:3px solid #e07a2f;padding-bottom:10px;margin-bottom:18px}h1{margin:0;font-size:28px}.tag{display:inline-block;padding:5px 9px;border-radius:999px;background:#f4f6f9;font-size:12px;margin-top:8px}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{text-align:left;border-bottom:1px solid #ddd;padding:9px 6px;font-size:13px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}.metrics div{background:#f4f6f9;padding:10px;border-radius:10px}.metrics b{display:block;font-size:18px}.notes{white-space:pre-wrap;margin-top:18px}.foot{margin-top:25px;font-size:11px;color:#687386}@media print{button{display:none}}</style></head><body><header><div>👨‍🍳🍽️ FOOD COST · Fiche ${finance?"Gestion":"Cuisine"}</div><h1>${esc(r.name)}</h1><span class="tag">${esc(status)}</span></header>${finance?`<div class="metrics"><div>Coût matière<b>${m.complete?m.sum.toFixed(2)+" €":"Incomplet"}</b></div><div>Prix vente<b>${Number(r.salePrice)>0?Number(r.salePrice).toFixed(2)+" €":"—"}</b></div><div>Coefficient<b>${m.coef?m.coef.toFixed(2):"—"}</b></div><div>Ratio matière<b>${m.ratio?m.ratio.toFixed(1)+" %":"—"}</b></div></div>`:""}<table><thead><tr><th>Ingrédient</th><th>Grammage</th><th>Fournisseur</th>${finance?"<th>Coût</th>":""}</tr></thead><tbody>${lines||'<tr><td colspan="4">Aucun ingrédient renseigné</td></tr>'}</tbody></table>${r.notes?`<div class="notes"><h3>Composition / notes</h3>${esc(r.notes)}</div>`:""}<div class="foot">Fiche générée depuis FOOD COST · ${new Date().toLocaleDateString("fr-FR")}</div><script>setTimeout(()=>print(),350)<\/script></body></html>`);w.document.close()
 }
-function installPrint(){
- let form=document.getElementById("editForm"),actions=form?.querySelector(".actions");if(!form||!actions||document.getElementById("v85Print"))return;
- let b=document.createElement("div");b.id="v85Print";b.className="techbox";b.innerHTML=`<b>🖨️ Fiche technique imprimable</b><p class="muted small">Cuisine = sans données financières. Gestion = avec coût, coefficient, ratio et marge.</p><div class="v85printgrid"><button type="button" data-mode="cuisine">👨‍🍳 Imprimer Cuisine</button><button type="button" data-mode="gestion">📊 Imprimer Gestion</button></div>`;form.insertBefore(b,actions);
- b.querySelectorAll("button").forEach(x=>x.onclick=()=>{let id=document.getElementById("editId")?.value,r=get(RK).find(q=>String(q.id)===String(id));if(r)printRecipe(r,x.dataset.mode)});
+const CATS=["Entrées","Plats","Pâtes","Pierrades","Pizzas","Desserts","Cocktails / Boissons","Autres"];
+function menuCategory(r){
+ let m=(window.FOOD_COST_MENU_DATA||[]).find(x=>norm(x.name)===norm(r.name)||(String(r.id)==="caponne"&&norm(x.name)==="poulet al capone"));
+ let c=r.category||m?.category||"Autres";
+ if(/^Pizzas/.test(c))return"Pizzas";
+ if(c==="Coupes glacées")return"Desserts";
+ return CATS.includes(c)?c:"Autres";
 }
+function saveCategory(id,cat){let rs=get(RK),r=rs.find(x=>String(x.id)===String(id));if(r){r.category=cat;put(RK,rs)}}
+function installPrint(){
+ let form=document.getElementById("editForm"); if(!form)return;
+ let h=form.querySelector("h2"); if(!h)return;
+ if(!document.getElementById("v86Tools")){
+   let b=document.createElement("div");b.id="v86Tools";b.className="v86tools";
+   b.innerHTML=`<b>🖨️ FICHE TECHNIQUE</b><p class="muted small">Impression A4 directement depuis la recette.</p><div class="v85printgrid"><button type="button" class="primary" data-mode="cuisine">👨‍🍳 Cuisine</button><button type="button" data-mode="gestion">📊 Gestion</button></div>`;
+   h.insertAdjacentElement("afterend",b);
+   b.querySelectorAll("button").forEach(x=>x.onclick=()=>{let id=document.getElementById("editId")?.value,r=get(RK).find(q=>String(q.id)===String(id));if(r)printRecipe(r,x.dataset.mode);else alert("Ouvre d’abord une recette.")});
+ }
+ if(!document.getElementById("v86Category")){
+   let l=document.createElement("label");l.id="v86Category";l.innerHTML=`Catégorie<select id="v86CategorySelect">${CATS.map(c=>`<option>${c}</option>`).join("")}</select>`;
+   let name=document.getElementById("editName")?.closest("label");(name||h).insertAdjacentElement("afterend",l);
+   document.getElementById("v86CategorySelect").addEventListener("change",e=>{let id=document.getElementById("editId")?.value;if(id)saveCategory(id,e.target.value)});
+ }
+ let id=document.getElementById("editId")?.value,r=get(RK).find(q=>String(q.id)===String(id));
+ if(r&&document.getElementById("v86CategorySelect"))document.getElementById("v86CategorySelect").value=menuCategory(r);
+}
+function organizeRecipes(){
+ let list=document.getElementById("recipeList"),panel=document.getElementById("recipes");if(!list||!panel)return;
+ let rs=get(RK);
+ // seed only category metadata from the existing menu; no recipe content/quantity is changed.
+ let changed=false;rs.forEach(r=>{if(!r.category){let c=menuCategory(r);if(c!=="Autres"){r.category=c;changed=true}}});if(changed)put(RK,rs);
+ if(!document.getElementById("v86CatBar")){
+   let bar=document.createElement("div");bar.id="v86CatBar";bar.className="v86catbar";
+   bar.innerHTML=["Toutes",...CATS].map((c,i)=>`<button type="button" data-cat="${c}" class="${i===0?"active":""}">${c}</button>`).join("");
+   list.insertAdjacentElement("beforebegin",bar);
+   bar.onclick=e=>{let b=e.target.closest("button");if(!b)return;bar.querySelectorAll("button").forEach(x=>x.classList.remove("active"));b.classList.add("active");filterCategory(b.dataset.cat)};
+ }
+ // Tag each existing recipe card by matching its visible recipe name, preserving all original click/edit handlers.
+ [...list.children].forEach(card=>{
+   if(card.dataset.v86cat)return;
+   let r=rs.find(x=>card.textContent.includes(x.name));
+   if(r){card.dataset.v86cat=menuCategory(r);card.dataset.v86name=norm(r.name)}
+ });
+ [...list.children].sort((a,b)=>(a.dataset.v86cat||"Autres").localeCompare(b.dataset.v86cat||"Autres","fr")||(a.dataset.v86name||"").localeCompare(b.dataset.v86name||"","fr")).forEach(x=>list.appendChild(x));
+ let active=document.querySelector("#v86CatBar button.active")?.dataset.cat||"Toutes";filterCategory(active);
+}
+function filterCategory(cat){let list=document.getElementById("recipeList");if(!list)return;[...list.children].forEach(x=>x.style.display=(cat==="Toutes"||x.dataset.v86cat===cat)?"":"none")}
 function scanBadge(){
  let builder=document.getElementById("plateBuilder");if(!builder||document.getElementById("v85AiNotice"))return;let p=document.createElement("div");p.id="v85AiNotice";p.className="v85notice";p.innerHTML="<b>📸 Estimation IA</b><br><span>Les composants et grammages proposés par une photo restent des estimations jusqu’à ta validation.</span>";builder.prepend(p)
 }
 function brand(){
- document.querySelector("header>span:last-child")&&(document.querySelector("header>span:last-child").textContent="V8.5");
- let link=document.querySelector('link[rel="apple-touch-icon"]')||document.createElement("link");link.rel="apple-touch-icon";link.href="./assiette-cost-icon.png?v=850";document.head.appendChild(link);
+ document.querySelector("header>span:last-child")&&(document.querySelector("header>span:last-child").textContent="V8.6");
+ let link=document.querySelector('link[rel="apple-touch-icon"]')||document.createElement("link");link.rel="apple-touch-icon";link.href="./assiette-cost-icon.png?v=860";document.head.appendChild(link);
 }
 let st=document.createElement("style");st.textContent=".v84item{padding:13px 0;border-top:1px solid #e4e8ef}.v84item small{display:block;color:#697386;margin:4px 0 7px}.v84item select,.v84item button{width:100%;margin-top:7px}.v85card{border-left:4px solid #e07a2f}.v85recipe{padding:12px 0;border-top:1px solid #e4e8ef}.v85weight{display:grid;grid-template-columns:1fr 100px 80px;gap:7px;align-items:center;margin-top:8px}.v85weight input,.v85weight select{width:100%;box-sizing:border-box}.v85printgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.v85notice{background:#fff6eb;border:1px solid #f0c28d;border-radius:12px;padding:11px;margin-bottom:12px}.v85notice span{font-size:.8rem;color:#697386}@media(max-width:560px){.v85weight{grid-template-columns:1fr 90px 70px}.v85printgrid{grid-template-columns:1fr}}";document.head.appendChild(st);
-setTimeout(()=>{brand();renderAmb();renderWeights();installPrint();scanBadge()},800);
-new MutationObserver(()=>{installPrint();scanBadge()}).observe(document.body,{subtree:true,attributes:true,attributeFilter:["open"]});
+setTimeout(()=>{brand();renderAmb();renderWeights();installPrint();scanBadge();organizeRecipes()},800);
+new MutationObserver(()=>{installPrint();scanBadge();organizeRecipes()}).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["open"]});
 })();

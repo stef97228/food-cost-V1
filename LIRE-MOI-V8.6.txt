@@ -1,0 +1,23 @@
+FOOD COST V8.6 — RECTIFICATION COMPLÈTE
+
+Remplacer uniquement :
+- v84-ambigu-par-recette.js
+
+Nouveautés / corrections :
+- bouton FICHE TECHNIQUE visible en haut de chaque fiche recette
+- impression Cuisine (sans finances)
+- impression Gestion (avec coûts / coefficient / ratio / marge)
+- catégories : Entrées, Plats, Pâtes, Pierrades, Pizzas, Desserts, Cocktails / Boissons, Autres
+- filtres de catégories directement dans Recettes
+- recettes triées alphabétiquement dans leur catégorie
+- champ Catégorie modifiable dans chaque fiche
+- les catégories existantes de la carte sont reprises automatiquement
+- Coupes glacées est rangé dans Desserts
+- toutes les familles de pizzas sont regroupées dans Pizzas
+- V8.5 grammages et V8.4 ambiguïtés conservés
+
+Sécurité :
+- aucun grammage inventé
+- aucun prix fournisseur ambigu validé
+- aucune recette existante supprimée
+- données locales conservées
