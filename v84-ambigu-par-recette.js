@@ -1,4 +1,4 @@
-/* FOOD COST V8.5 — V8.4 ambiguïtés + fiches imprimables + grammages + PWA */
+/* FOOD COST V8.6.1 — V8.4 ambiguïtés + fiches imprimables + grammages + PWA */
 (()=>{const RK="foodCostRecipesV3",PK="foodCostProductsV5",get=(k,d=[])=>{try{return JSON.parse(localStorage.getItem(k)||"null")??d}catch{return d}},put=(k,v)=>localStorage.setItem(k,JSON.stringify(v)),norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/œ/g,"oe").replace(/[^a-z0-9]+/g," ").trim(),compat=(i,p)=>(p.unit==="kg"&&["g","kg"].includes(i.unit))||(p.unit==="L"&&["ml","cl","L"].includes(i.unit))||(p.unit==="piece"&&i.unit==="piece");
 const fam=n=>{n=norm(n);if(n==="mozzarella")return"mozzarella";if(n==="parmesan")return"parmesan";if(n==="poulet")return"poulet";if(/^champignon/.test(n))return"champignons";if(n==="poulpe"||n==="polpo")return"poulpe";return""},lab={mozzarella:"Mozzarella",parmesan:"Parmesan",poulet:"Poulet",champignons:"Champignons",poulpe:"Poulpe / Polpo"};
 function cand(f,i){return get(PK).filter(p=>compat(i,p)).filter(p=>{let n=norm(p.name);return f==="mozzarella"?n.includes("mozzarella"):f==="parmesan"?/parmigiano|grana padano/.test(n):f==="poulet"?n.includes("poulet"):f==="champignons"?n.includes("champignon"):/chatrou|poulpe/.test(n)})}
@@ -40,4 +40,56 @@ function brand(){
 let st=document.createElement("style");st.textContent=".v84item{padding:13px 0;border-top:1px solid #e4e8ef}.v84item small{display:block;color:#697386;margin:4px 0 7px}.v84item select,.v84item button{width:100%;margin-top:7px}.v85card{border-left:4px solid #e07a2f}.v85recipe{padding:12px 0;border-top:1px solid #e4e8ef}.v85weight{display:grid;grid-template-columns:1fr 100px 80px;gap:7px;align-items:center;margin-top:8px}.v85weight input,.v85weight select{width:100%;box-sizing:border-box}.v85printgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.v85notice{background:#fff6eb;border:1px solid #f0c28d;border-radius:12px;padding:11px;margin-bottom:12px}.v85notice span{font-size:.8rem;color:#697386}@media(max-width:560px){.v85weight{grid-template-columns:1fr 90px 70px}.v85printgrid{grid-template-columns:1fr}}";document.head.appendChild(st);
 setTimeout(()=>{brand();renderAmb();renderWeights();installPrint();scanBadge()},800);
 new MutationObserver(()=>{installPrint();scanBadge()}).observe(document.body,{subtree:true,attributes:true,attributeFilter:["open"]});
+
+const V861_CATS=["Entrées","Plats","Pâtes","Pierrades","Pizzas","Desserts","Cocktails / Boissons","Autres"];
+function v861MenuCategory(r){
+ let menu=window.FOOD_COST_MENU_DATA||[], m=menu.find(x=>norm(x.name)===norm(r.name)), c=r.category||m?.category||"Autres";
+ if(/^Pizzas/.test(c))return "Pizzas";
+ if(c==="Coupes glacées")return "Desserts";
+ return V861_CATS.includes(c)?c:"Autres";
+}
+function v861SeedCategories(){
+ let rs=get(RK),changed=false;
+ rs.forEach(r=>{if(!r.category){let c=v861MenuCategory(r);if(c!=="Autres"){r.category=c;changed=true}}});
+ if(changed)put(RK,rs);
+}
+function v861Filter(cat){
+ let list=document.getElementById("recipeList"); if(!list)return;
+ [...list.children].forEach(card=>{
+   let txt=norm(card.textContent), r=get(RK).find(x=>txt.includes(norm(x.name)));
+   card.style.display=(cat==="Toutes"||!r||v861MenuCategory(r)===cat)?"":"none";
+ });
+ document.querySelectorAll("#v861CatBar button").forEach(b=>b.classList.toggle("active",b.dataset.cat===cat));
+}
+function v861CategoryBar(){
+ let panel=document.getElementById("recipes"), list=document.getElementById("recipeList"); if(!panel||!list||document.getElementById("v861CatBar"))return;
+ let bar=document.createElement("div");bar.id="v861CatBar";bar.className="v861catbar";
+ ["Toutes",...V861_CATS].forEach(c=>{let b=document.createElement("button");b.type="button";b.dataset.cat=c;b.textContent=c;if(c==="Toutes")b.classList.add("active");b.onclick=()=>v861Filter(c);bar.appendChild(b)});
+ list.before(bar);
+}
+function v861CategoryField(){
+ let form=document.getElementById("editForm"), notes=document.getElementById("editNotes"); if(!form||!notes||document.getElementById("v861Category"))return;
+ let label=document.createElement("label");label.id="v861Category";label.innerHTML=`Catégorie<select id="v861CategorySelect">${V861_CATS.map(c=>`<option>${c}</option>`).join("")}</select>`;
+ notes.closest("label")?.insertAdjacentElement("afterend",label);
+ let sel=label.querySelector("select");
+ let sync=()=>{let id=document.getElementById("editId")?.value,r=get(RK).find(x=>String(x.id)===String(id));if(r)sel.value=v861MenuCategory(r)};
+ sel.onchange=()=>{let id=document.getElementById("editId")?.value,rs=get(RK),r=rs.find(x=>String(x.id)===String(id));if(!r)return;r.category=sel.value;put(RK,rs);v861Filter("Toutes")};
+ document.getElementById("editDialog")?.addEventListener("toggle",sync);
+ setTimeout(sync,50);
+}
+function v861PrintTop(){
+ let form=document.getElementById("editForm"); if(!form||document.getElementById("v861PrintTop"))return;
+ let old=document.getElementById("v85Print"); if(old)old.style.display="none";
+ let box=document.createElement("div");box.id="v861PrintTop";box.className="v861tools";
+ box.innerHTML=`<b>🖨️ FICHE TECHNIQUE</b><div class="v85printgrid"><button type="button" data-mode="cuisine">👨‍🍳 Cuisine</button><button type="button" data-mode="gestion">📊 Gestion</button></div>`;
+ form.querySelector("h2")?.insertAdjacentElement("afterend",box);
+ box.querySelectorAll("button").forEach(b=>b.onclick=()=>{let id=document.getElementById("editId")?.value,r=get(RK).find(q=>String(q.id)===String(id));if(r)printRecipe(r,b.dataset.mode)});
+}
+function v861Init(){
+ v861SeedCategories();v861CategoryBar();v861CategoryField();v861PrintTop();
+ document.querySelector("header>span:last-child")&&(document.querySelector("header>span:last-child").textContent="V8.6.1");
+}
+let v861style=document.createElement("style");v861style.textContent=".v861catbar{display:flex;gap:7px;overflow-x:auto;padding:8px 0 12px}.v861catbar button{white-space:nowrap}.v861catbar button.active{background:#ff7548;color:#fff}.v861tools{border:2px solid #e07a2f;border-radius:14px;padding:12px;margin:10px 0 14px;background:#fff6eb}.v861tools>b{display:block;margin-bottom:9px}";document.head.appendChild(v861style);
+setTimeout(v861Init,1100);
+
 })();

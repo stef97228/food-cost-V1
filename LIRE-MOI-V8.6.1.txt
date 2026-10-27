@@ -1,0 +1,10 @@
+RECTIFICATION STABLE V8.6.1
+Remplacer uniquement les 2 fichiers à la racine :
+- v84-ambigu-par-recette.js
+- index.html
+
+Cette version repart du script V8.5.1 stable.
+Ajouts : filtres par catégories, catégorie éditable, boutons FICHE TECHNIQUE visibles en haut.
+Sécurité : pas d'observer childList global, pas de boucle de tri DOM.
+Le ?v=861 force le rechargement sur iPhone.
+Ne supprime pas l'application et n'efface pas les données Safari.
