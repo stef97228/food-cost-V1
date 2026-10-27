@@ -1,0 +1,19 @@
+/* FOOD COST V8.6.2 — import contrôlé documents 26-27/10/2026 */
+(()=>{const PK="foodCostProductsV5",IK="foodCostInvoicesV5",MK="foodCostImportMorning20261027V1";
+const get=(k,d=[])=>{try{return JSON.parse(localStorage.getItem(k)||"null")??d}catch{return d}},put=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+if(localStorage.getItem(MK))return;let ps=get(PK,[]);
+const ss=(a,b)=>{a=norm(a);b=norm(b);if(a.includes("marche caraib")&&b.includes("marche caraib"))return true;if(a.includes("a m martinique")&&b.includes("a m martinique"))return true;return a===b};
+function up(x){let p=ps.find(p=>ss(p.supplier,x.supplier)&&(x.tokens||[x.name]).every(t=>norm(p.name).includes(norm(t))));if(p){let h=Array.isArray(p.history)?p.history:[];if(!h.some(v=>v.date===x.date&&Math.abs(Number(v.price)-x.price)<.0001))h.push({date:x.date,price:x.price});p.history=h;p.price=x.price;p.priceDate=x.date;return}ps.push({id:"p-import-"+norm(x.supplier+" "+x.name).replace(/\s+/g,"-").slice(0,55),supplier:x.supplier,name:x.name,price:x.price,unit:x.unit,priceDate:x.date,history:[{date:x.date,price:x.price}]})}
+up({supplier:"Marché Caraïbes Martinique",name:"Longe de thon Tex Fish",price:13,unit:"kg",date:"2026-10-27",tokens:["thon"]});
+up({supplier:"Marché Caraïbes Martinique",name:"Chatrou boule 1-2 kg",price:11.5,unit:"kg",date:"2026-10-27",tokens:["chatrou"]});
+up({supplier:"Pytheas",name:"De Cecco Penne Rigate n°41 sac 1 kg",price:3.885,unit:"kg",date:"2026-10-26",tokens:["penne","rigate"]});
+up({supplier:"A&M Martinique",name:"Lait de coco Kreyole 18% 1 L",price:7.87,unit:"L",date:"2026-10-26",tokens:["lait","coco"]});
+up({supplier:"A&M Martinique",name:"Quart d'artichaut à l'huile",price:13.44,unit:"piece",date:"2026-10-26",tokens:["artichaut"]});
+up({supplier:"A&M Martinique",name:"Crème UHT Pays Breton 35% 1 L",price:5.55,unit:"L",date:"2026-10-26",tokens:["creme","pays","breton"]});put(PK,ps);
+let inv=get(IK,[]),docs=[
+{id:"import-263042-20261027",supplier:"Marché Caraïbes Martinique",date:"2026-10-27",ref:"263042",fileName:"Photo facture reçue 27/10/2026",lines:[{name:"Longe de thon Tex Fish",qty:24,price:13,unit:"kg",total:312},{name:"Chatrou boule 1-2 kg / carton 10 kg",qty:20,price:11.5,unit:"kg",total:230}]},
+{id:"import-PBL9002891-20261026",supplier:"Pytheas",date:"2026-10-26",ref:"PBL 9002891",fileName:"Bon de livraison reçu 27/10/2026",lines:[{name:"De Cecco Penne Rigate n°41 sac 1 kg",qty:12,price:3.885,unit:"kg",total:46.62}]},
+{id:"import-NBL9008804-20261026",supplier:"Nouvelle Ozier LaFontaine",date:"2026-10-26",ref:"NBL 9008804",fileName:"Bon de livraison reçu 27/10/2026",lines:[{name:"Sanytol Pro désinfectant multisurfaces Fresh 750 ml",qty:12,price:3.72,unit:"piece",total:44.64},{name:"Kaz'Net Javel bidon 5 L",qty:4,price:4.52,unit:"piece",total:18.08},{name:"Nettoyant concentré multisurfaces citron 5 L Solipropre",qty:1,price:10.56,unit:"piece",total:10.56}]},
+{id:"import-AMM263085240-20261026",supplier:"A&M Martinique",date:"2026-10-26",ref:"AMM263085240",fileName:"Photo facture reçue 27/10/2026",lines:[{name:"Lait de coco Kreyole 18% 1 L",qty:12,price:7.87,unit:"L",total:94.44},{name:"Quart d'artichaut à l'huile",qty:6,price:13.44,unit:"piece",total:80.64},{name:"Crème UHT Pays Breton 35% 1 L",qty:36,price:5.55,unit:"L",total:199.8}]}];
+for(const d of docs)if(!inv.some(x=>x.id===d.id||((x.ref||"").replace(/\s/g,"")===d.ref.replace(/\s/g,"")&&x.date===d.date)))inv.unshift(d);put(IK,inv);localStorage.setItem(MK,new Date().toISOString());setTimeout(()=>{try{renderAll?.()}catch(e){}},300)})();

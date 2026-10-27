@@ -1,0 +1,1 @@
+Déposer à la racine GitHub : index.html (remplacer) + v862-import-factures.js (nouveau). Import unique des 4 documents du 26-27/10/2026. Les produits d'entretien NOL restent dans l'historique des documents et ne sont pas ajoutés aux matières premières.
