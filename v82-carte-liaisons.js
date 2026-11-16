@@ -24,7 +24,7 @@ function seed(){
  }
  if(changed)put(RK,rs);localStorage.setItem(MIG,"1");
 }
-function rule(i,p){let n=norm(i.name),pn=norm(p.name),s=norm(p.supplier),score=0,amb=false;
+function rule(i,p){let n=norm(i.name),pn=norm(p.name),score=0;
  const hit=(a,b)=>n.includes(a)&&pn.includes(b);
  if(hit("jambon cru","prosciutto")||hit("jambon italien","prosciutto"))score=100;
  if(hit("jambon blanc","jambon blanc"))score=100;
@@ -36,20 +36,56 @@ function rule(i,p){let n=norm(i.name),pn=norm(p.name),s=norm(p.supplier),score=0
  if(hit("huile d olive","huile olive"))score=100;if(hit("lait","lait demi"))score=100;if(hit("beurre","beurre doux"))score=100;
  if(hit("pesto vert","pesto vert"))score=100;if(hit("paccheri","paccheri"))score=100;
  if(hit("steak hache","steak hache"))score=100;if(hit("viande hachee","hache boeuf"))score=100;
- if(n==="poulet"||n==="mozzarella"||n==="parmesan"||n==="champignons"||n==="poulpe"){amb=true;score=0}
+ if(n==="poulet"||n==="mozzarella"||n==="parmesan"||n==="champignons"||n==="poulpe"){score=0}
  if(n.includes("cuisse")&&pn.includes("cuisse")&&pn.includes("poulet"))score=100;
- return{score,amb};
+ return score;
 }
 function compatible(i,p){return(p.unit==="kg"&&["g","kg"].includes(i.unit))||(p.unit==="L"&&["ml","cl","L"].includes(i.unit))||(p.unit==="piece"&&i.unit==="piece")}
-function proposal(i){if(i.productId||i.subrecipeId||Number(i.manualPrice)>0)return null;let a=get(PK).map(p=>({p,...rule(i,p)})).filter(x=>x.score>=100&&compatible(i,x.p));return a.length===1?a[0].p:null}
-function stats(){let rs=get(RK),safe=0,amb=0,missing=0;for(const r of rs)for(const i of r.ingredients||[]){if(i.productId||i.subrecipeId||Number(i.manualPrice)>0)continue;if(proposal(i))safe++;else{let n=norm(i.name);if(["poulet","mozzarella","parmesan","champignons","poulpe"].some(x=>n===x||n.includes(x)))amb++;else missing++}}return{safe,amb,missing}}
+const manualReview = new Set(["poulet","mozzarella","parmesan","champignon","champignons","poulpe","polpo"]);
+const alreadyPriced = i => i.productId || i.subrecipeId || Number(i.manualPrice)>0;
+function matchingProducts(i, products) {
+ const name = norm(i.name);
+ if (!name || manualReview.has(name)) return [];
+ const eligible = products.filter(p => p.id && Number.isFinite(Number(p.price)) && Number(p.price)>0 && compatible(i,p));
+ const exact = eligible.filter(p => norm(p.name)===name);
+ return exact.length ? exact : eligible.filter(p => rule(i,p)>=100);
+}
+window.foodCostSupplierMatches = matchingProducts;
+function pendingLinks(recipes, products) {
+ const result = {safe:[],amb:0,missing:0};
+ for (const recipe of recipes) {
+  for (const ingredient of recipe.ingredients || []) {
+   if (alreadyPriced(ingredient)) continue;
+   const matches = matchingProducts(ingredient, products);
+   if (matches.length===1) result.safe.push({ingredient,product:matches[0]});
+   else if (matches.length>1 || manualReview.has(norm(ingredient.name))) result.amb++;
+   else result.missing++;
+  }
+ }
+ return result;
+}
 function render(){
  let panel=document.getElementById("recipes");if(!panel)return;let old=document.getElementById("v82Links");if(old)old.remove();
- let box=document.createElement("div");box.id="v82Links";box.className="card";let s=stats();
- box.innerHTML=`<b>🔗 Liaisons fournisseurs · carte complète</b><p class="muted small">Les correspondances sûres sont préparées, jamais appliquées sans validation. Mozzarella, parmesan, poulet générique, champignons et poulpe restent à contrôler.</p><div class="v82grid"><span><strong>${s.safe}</strong><small>sûres à valider</small></span><span><strong>${s.amb}</strong><small>ambiguës</small></span><span><strong>${s.missing}</strong><small>sans prix trouvé</small></span></div><button type="button" id="v82Apply" class="primary">Valider toutes les liaisons sûres</button>`;
+ let box=document.createElement("div");box.id="v82Links";box.className="card";let s=pendingLinks(get(RK),get(PK));
+ box.innerHTML=`<b>🔗 Liaisons fournisseurs · carte complète</b><p class="muted small">Les correspondances sûres sont préparées, jamais appliquées sans validation. Mozzarella, parmesan, poulet générique, champignons et poulpe restent à contrôler.</p><div class="v82grid"><span><strong>${s.safe.length}</strong><small>sûres à valider</small></span><span><strong>${s.amb}</strong><small>ambiguës</small></span><span><strong>${s.missing}</strong><small>sans prix trouvé</small></span></div><button type="button" id="v82Apply" class="primary" ${s.safe.length ? "" : "disabled"}>Valider toutes les liaisons sûres</button>`;
  let anchor=document.getElementById("v81Queue");(anchor||panel.querySelector("h2")).insertAdjacentElement("afterend",box);
- document.getElementById("v82Apply").onclick=()=>{let rs=get(RK),n=0;for(const r of rs)for(const i of r.ingredients||[]){let p=proposal(i);if(p){i.productId=p.id;i.manualPrice=null;i.status=(i.status||"")+" · prix lié";n++}}put(RK,rs);alert(`${n} liaison${n>1?"s":""} fournisseur validée${n>1?"s":""}. Les cas ambigus n'ont pas été modifiés.`);try{renderRecipes?.()}catch(e){}setTimeout(()=>{render();document.dispatchEvent(new Event("visibilitychange"))},100)};
+ document.getElementById("v82Apply").onclick=()=>{
+  const recipes=get(RK);
+  const {safe}=pendingLinks(recipes,get(PK));
+  if (!safe.length) { render(); return; }
+  for (const {ingredient,product} of safe) {
+   ingredient.productId=product.id;
+   ingredient.manualPrice=null;
+   ingredient.status=[ingredient.status,"prix lié"].filter(Boolean).join(" · ");
+  }
+  put(RK,recipes);
+  alert(`${safe.length} liaison${safe.length>1?"s":""} fournisseur validée${safe.length>1?"s":""}.`);
+  try{renderRecipes?.()}catch(e){}
+  render();
+  document.dispatchEvent(new Event("visibilitychange"));
+ };
 }
 let st=document.createElement("style");st.textContent=".v82grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:10px 0}.v82grid span{padding:9px;border-radius:12px;background:#f4f6f9;display:flex;flex-direction:column}.v82grid strong{font-size:1.15rem}.v82grid small{font-size:.72rem;color:#697386}#v82Apply{width:100%;margin-top:4px}";document.head.appendChild(st);
+document.addEventListener("foodcost:supplier-links-changed",render);
 seed();setTimeout(()=>{try{renderRecipes?.()}catch(e){}render()},650);
 })();
