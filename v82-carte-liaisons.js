@@ -64,25 +64,34 @@ function pendingLinks(recipes, products) {
  }
  return result;
 }
-function render(){
+function render(message=""){
  let panel=document.getElementById("recipes");if(!panel)return;let old=document.getElementById("v82Links");if(old)old.remove();
  let box=document.createElement("div");box.id="v82Links";box.className="card";let s=pendingLinks(get(RK),get(PK));
- box.innerHTML=`<b>🔗 Liaisons fournisseurs · carte complète</b><p class="muted small">Les correspondances sûres sont préparées, jamais appliquées sans validation. Mozzarella, parmesan, poulet générique, champignons et poulpe restent à contrôler.</p><div class="v82grid"><span><strong>${s.safe.length}</strong><small>sûres à valider</small></span><span><strong>${s.amb}</strong><small>ambiguës</small></span><span><strong>${s.missing}</strong><small>sans prix trouvé</small></span></div><button type="button" id="v82Apply" class="primary" ${s.safe.length ? "" : "disabled"}>Valider toutes les liaisons sûres</button>`;
+ box.innerHTML=`<b>🔗 Liaisons fournisseurs · carte complète</b><p class="muted small">Les correspondances sûres sont préparées, jamais appliquées sans validation. Mozzarella, parmesan, poulet générique, champignons et poulpe restent à contrôler.</p><div class="v82grid"><span><strong>${s.safe.length}</strong><small>sûres à valider</small></span><span><strong>${s.amb}</strong><small>ambiguës</small></span><span><strong>${s.missing}</strong><small>sans prix trouvé</small></span></div><button type="button" id="v82Apply" class="primary" ${s.safe.length ? "" : "disabled"}>Valider toutes les liaisons sûres</button><p class="muted small" role="status"></p>`;
  let anchor=document.getElementById("v81Queue");(anchor||panel.querySelector("h2")).insertAdjacentElement("afterend",box);
- document.getElementById("v82Apply").onclick=()=>{
+ const status=box.querySelector('[role="status"]');
+ status.textContent=typeof message==="string"?message:"";
+ box.querySelector("button").onclick=()=>{
   const recipes=get(RK);
   const {safe}=pendingLinks(recipes,get(PK));
-  if (!safe.length) { render(); return; }
+  if (!safe.length) { render("Aucune liaison sûre en attente."); return; }
   for (const {ingredient,product} of safe) {
    ingredient.productId=product.id;
    ingredient.manualPrice=null;
    ingredient.status=[ingredient.status,"prix lié"].filter(Boolean).join(" · ");
   }
-  put(RK,recipes);
-  alert(`${safe.length} liaison${safe.length>1?"s":""} fournisseur validée${safe.length>1?"s":""}.`);
+  try {
+   put(RK,recipes);
+  } catch (error) {
+   status.textContent=error.name==="QuotaExceededError"
+    ? "Stockage du navigateur plein. Les liaisons n’ont pas été enregistrées."
+    : "Enregistrement impossible ("+(error.name||"erreur inconnue")+"). Les liaisons n’ont pas été enregistrées.";
+   return;
+  }
+  const confirmation=safe.length===1?"1 liaison fournisseur validée.":safe.length+" liaisons fournisseurs validées.";
   try{renderRecipes?.()}catch(e){}
-  render();
   document.dispatchEvent(new Event("visibilitychange"));
+  render(confirmation);
  };
 }
 let st=document.createElement("style");st.textContent=".v82grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:10px 0}.v82grid span{padding:9px;border-radius:12px;background:#f4f6f9;display:flex;flex-direction:column}.v82grid strong{font-size:1.15rem}.v82grid small{font-size:.72rem;color:#697386}#v82Apply{width:100%;margin-top:4px}";document.head.appendChild(st);
